@@ -386,7 +386,6 @@ node_modules/
 **/launchSettings.json
 **/launch.json
 **/tasks.json
-**/appsettings.json
 
 #Mac specific files
 *.DS_Store
