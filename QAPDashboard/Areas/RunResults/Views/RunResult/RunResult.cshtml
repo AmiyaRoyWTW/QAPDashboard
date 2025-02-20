@@ -1,0 +1,477 @@
+﻿@using QAPDashboard.Views.Shared.Components.Button;
+@model RunResultViewModel
+
+@{
+    ViewData["Title"] = "Test Results: " + @Model.RunId;
+    @*var ReRunUrl = "/runner";
+    if (Model.AppType == null || Model.AppType != "local")
+    {
+        ReRunUrl = "http://localhost:5000/runner";
+    }*@
+
+}
+
+@section AddedStyles
+{
+    <script src="~/js/Chart.min.js" type="text/javascript"></script>
+    <script src="~/js/site.js" type="text/javascript"></script>
+}
+
+<div class="container mx-auto">
+    <div id="presets" class="mt-8 text-slate-700 rounded p-4 ">
+        <h2 class="text-3xl mb-4">Call Details</h2>
+        <table id="runsTable" class="w-full bg-white  mt-4 table-auto">
+            <thead class="bg-bluegw-100 text-slate-700">
+                <tr>
+                    <th class="p-4 border border-gray-300">Result</th>
+                    <th class="p-4 border border-gray-300">Dial Result</th>
+                    <th class="p-4 border border-gray-300">Run Date</th>
+                    <th class="p-4 border border-gray-300">Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-white hover:bg-sky-50">
+                    <td class="text-3xl text-center font-extrabold">@Model.RunStatus</td>
+                    <td class="font-extrabold text-3xl text-center">@Model.DialResult</td>
+                    <td class="font-extrabold text-3xl text-center">@Model.RunDate.ToString("HH:mm:ss")</td>
+                    <td class="font-extrabold text-3xl text-center">@Model.RunDuration</td>
+                </tr>
+                <tr class="bg-white hover:bg-sky-50">
+                    <td class="truncate"></td>
+                    <td class="truncate"></td>
+                    <td class="p-4 text-center border-none font-light">@Model.RunDate.ToString("MM/dd/yyyy")</td>
+                    <td class="p-4 text-center border-none font-light">hh:mm:ss</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 class="text-3xl mb-4">Step Details</h2>
+        <table id="runsTable" class="w-full bg-white mt-4 table-auto">
+            <thead class="bg-bluegw-100 text-slate-700">
+                <tr>
+                    <th class="p-4 border border-gray-300">Step</th>
+                    <th class="p-4 border border-gray-300">Description</th>
+                    <th class="p-4 border border-gray-300">Expect to Hear</th>
+                    <th class="p-4 border border-gray-300">Transcription</th>
+                    <th class="p-4 border border-gray-300">Reply With</th>
+                    <th class="p-4 border border-gray-300">Detailed Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var step in Model.Steps)
+                {
+                    <tr class="bg-white hover:bg-sky-50">
+                        <td class="p-4 border border-gray-300">@step.StepId</td>
+                        <td class="p-4 border border-gray-300">@step.StepName</td>
+                        <td class="p-4 border border-gray-300">@step.ExpectToHear</td>
+                        <td class="p-4 border border-gray-300">@step.Transcription</td>
+                        <td class="p-4 border border-gray-300">@step.ReplyWith</td>
+                        <td class="p-4 border border-gray-300">
+                            <span class="border-2 border-solid font-extrabold text-center bg-green-500 opacity-100">
+                                @step.Status</span>
+                            <li class="font-light">Mathed with confidence: @step.Confidence%</li>
+                            <li class="font-light">Duration: @step.StepDuration</li>
+                            <li class="font-light">Response time: @step.ResponseTime</li>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@*@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            initializeTabs();
+            initializeChart();
+            initializeSections();
+            document.querySelector('#listAll').click();
+        });
+
+        function initializeTabs() {
+            var tabButtons = document.querySelectorAll('[role="tab"]');
+            var tabContents = document.querySelectorAll('[role="tabpanel"]');
+
+            tabButtons.forEach(function (button, index) {
+                button.addEventListener("click", function () {
+                    hideAllTabs();
+                    hideAllButtons();
+
+                    tabContents[index].classList.remove("hidden");
+                    button.classList.add("active", "bg-bluegw-700", "text-white");
+                    button.setAttribute('aria-selected', true);
+                });
+            });
+
+            tabButtons[0].click();
+        }
+
+        function hideAllTabs() {
+            var tabContents = document.querySelectorAll('[role="tabpanel"]');
+            tabContents.forEach(function (content) {
+                content.classList.add("hidden");
+            });
+        }
+
+        function hideAllButtons() {
+            var tabButtons = document.querySelectorAll('[role="tab"]');
+            tabButtons.forEach(function (btn) {
+                btn.classList.remove("active", "bg-bluegw-700", "text-white");
+                btn.setAttribute('aria-selected', false);
+            });
+        }
+
+        function initializeChart() {
+            var randomScalingFactor = function () {
+                return Math.round(Math.random() * 100);
+            };
+
+            var config = {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [
+                            @Model.PassedCount,
+                            @Model.FailedCount,
+                            @Model.BlockedCount,
+                            @Model.QueuedCount,
+                            @Model.StartedCount,
+                        ],
+                        backgroundColor: [
+                            'rgba(64, 214, 0, 1)',
+                            'rgba(245, 45, 0, 1)',
+                            'rgba(255, 149, 0, 1)',
+                            'rgba(245, 237, 0, 1)',
+                            'rgba(0, 200, 245, 1)',
+                        ],
+                    }],
+                    labels: [
+                        'Passed',
+                        'Failed',
+                        'Blocked',
+                        'Queued',
+                        'Started',
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'bottom',
+                    },
+                }
+            };
+
+            window.onload = function () {
+                var ctx = document.getElementById('chart-area').getContext('2d');
+                window.myPie = new Chart(ctx, config);
+
+                window.ResultUpdater("@Model.RunId");
+            };
+        }
+
+        function initializeSections() {
+            showSection('listAll');
+            document.getElementById('listAll').addEventListener('click', function () {
+                showSection('listAll');
+            });
+
+            document.getElementById('groupByError').addEventListener('click', function () {
+                showSection('groupedByError');
+            });
+
+            document.querySelector('#openAll').addEventListener("click", function () {
+                openAllFailedTestLinks();
+            });
+
+            var sendToDashButton = document.querySelector('#sendToDashButton');
+            if (sendToDashButton) {
+                sendToDashButton.addEventListener("click", function () {
+                    location.href = "/run-result/@Model.RunId/submit";
+                });
+            }
+        }
+
+        function showSection(sectionName) {
+            hideAllSections();
+            document.querySelectorAll('.' + sectionName).forEach(function (el) {
+                el.style.display = 'block';
+            });
+        }
+
+        function hideAllSections() {
+            document.querySelectorAll('.listAll, .groupedByError').forEach(function (el) {
+                el.style.display = 'none';
+            });
+        }
+
+        function openAllFailedTestLinks() {
+            document.querySelectorAll(".listAll .failedTestLink").forEach(function (aElem) {
+                window.open(aElem.getAttribute("href"), "_blank");
+            });
+        }
+
+        window.ResultUpdater = (testRunId) => {
+            function updatePie(data) {
+                window.myPie.data.datasets.forEach((dataset) => {
+                    dataset.data = data;
+                });
+                window.myPie.update();
+            }
+
+            function updateEndTime(endTime) {
+                let date = new Date(endTime);
+                if (date.getYear() > 0) {
+                    let dtf = new Intl.DateTimeFormat('en', {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: '2-digit',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                    let [{ value: mo }, , { value: da }, , { value: ye }, , { value: hr }, , { value: mn }, , { value: sc }, , { value: dp }] = dtf.formatToParts(date);
+                    endTimeSpan.innerText = `${mo}/${da}/${ye} ${hr}:${mn}:${sc} ${dp}`;
+                    endTimeSpan.style.fontStyle = "normal";
+                    endTimeSpan.setAttribute("datetime", date.toISOString());
+                }
+            }
+
+            let endTimeSpan = document.querySelector('#endTime');
+
+            let passedCount = document.querySelector('#passed-tab');
+            let passedTests = document.querySelector('#passed-tests');
+
+            let queuedCount = document.querySelector('#queued-tab');
+            let queuedTests = document.querySelector('#queued-tests');
+
+            let blockedCount = document.querySelector('#blocked-tab');
+            let blockedTests = document.querySelector('#blocked-tests');
+
+            let startedCount = document.querySelector('#started-tab');
+            let startedTests = document.querySelector('#started-tests');
+
+            let failedCount = document.querySelector('#failed-tab');
+            let failedTests = document.querySelector('#failed-tests');
+
+            if (new Date(endTimeSpan.getAttribute('datetime')).getYear() < 0) {
+                poll((next, stop) => {
+                    if ('myPie' in window) {
+                        let r = new XMLHttpRequest();
+                        r.open('GET', `/run-result/${testRunId}/json`, true);
+                        r.onreadystatechange = () => {
+                            if (r.readyState === 4 && r.status === 200) {
+                                let response = JSON.parse(r.responseText);
+                                if (response !== null) {
+                                    updatePie([
+                                        response.passedTestCases.length,
+                                        response.failedTestCases.length,
+                                        response.blockedTestCases.length,
+                                        response.queuedTestCases.length,
+                                        response.startedTestCases.length
+                                    ]);
+
+                                    updateEndTime(response.endTime);
+                                    updatePassedPanel(testRunId, passedTests, response.passedTestCases, passedCount);
+                                    updateQueuedPanel(testRunId, queuedTests, response.queuedTestCases, queuedCount);
+                                    updateBlockedPanel(testRunId, blockedTests, response.blockedTestCases, blockedCount);
+                                    updateStartedPanel(testRunId, startedTests, response.startedTestCases, startedCount);
+                                    updateFailedPanel(testRunId, failedTests, response.failedTestCases, response.failedTestCasesByMessage, failedCount);
+                                    updateRunDetailButtonWrapper(response.nonPassedTestCaseQueryStrings);
+                                    switchFailedAndPassedTabsIfNeeded(response.failedTestCases);
+                                    if (response.startedTestCases.length === 0 && response.queuedTestCases.length === 0) {
+                                        stop();
+                                    } else {
+                                        next();
+                                    }
+                                } else {
+                                    next();
+                                }
+                            }
+                        };
+                        r.send();
+                    } else {
+                        next();
+                    }
+                });
+            }
+        };
+
+        // Function to switch the "failed" and "passed" tabs if there are failed tests
+        function switchFailedAndPassedTabsIfNeeded(failedTestCases) {
+            if (failedTestCases.length > 0) {
+                var passedPanel = document.getElementById('passed-panel');
+                var failedPanel = document.getElementById('failed-panel');
+                var passedTab = document.getElementById('passed-tab');
+                var failedTab = document.getElementById('failed-tab');
+
+                // Check if both panels and tabs exist
+                if (passedPanel && failedPanel && passedTab && failedTab) {
+                    // Get the parent element of the panels
+                    var parentPanel = passedPanel.parentNode;
+                    var parentTab = passedTab.parentNode;
+
+                    // Check if failedPanel is already before passedPanel
+                    if (failedPanel.nextElementSibling !== passedPanel) {
+                        // Insert the failedPanel before the passedPanel
+                        parentPanel.insertBefore(failedPanel, passedPanel);
+
+                        // Insert the failedTab before the passedTab
+                        parentTab.insertBefore(failedTab, passedTab);
+                        failedTab.click();
+                    }
+                } else {
+                    console.error("One or more panels or tabs are not found in the DOM.");
+                }
+            }
+        }
+
+
+
+        function updateRunDetailButtonWrapper(nonPassedTestCases) {
+            if (!Array.isArray(nonPassedTestCases)) {
+                console.log("nonPassedTestCases is not an array.");
+                return;
+            }
+            let runDetailButtonWrapperContent =
+                `
+                <div id="RunDetailButtonWrapper" class="mt-4">
+                    <form method="post" action="@ReRunUrl">
+                        <input name="rerunApplication" value="@Model.Application" type="hidden" />
+                        <input name="rerunSuiteType" value="@Model.TestSuiteType" type="hidden" />
+                        <input name="reRuntestList" value="${nonPassedTestCases.join(',')}" type = "hidden" />
+                        @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "rerunFailedTests", Name = "createNewPreset", Type = "submit", Text = "Re-run failed/incomplete test cases" })
+                    </form>
+                </div>
+                `;
+
+            let runDetailButtonWrapper = document.getElementById("RunDetailButtonWrapper");
+            runDetailButtonWrapper.innerHTML = runDetailButtonWrapperContent;
+        }
+
+        function updateFailedPanel(testRunId, panelElement, failedTests, failedTestsByMessageLists, countElement) {
+            if (!failedTests || !Array.isArray(failedTests) || failedTests.length === 0) {
+                return;
+            }
+            let panelContent = `
+                                <div id="failed-tests">
+                                    <fieldset>
+                                        <ul class="list-none p-0 m-0 listAll">
+                                            ${failedTests.map(failedTest => `
+                                                <li class="bg-white hover:bg-gray-100 border-b border-gray-200 mb-4 p-4">
+                                                    <span class="p-4">
+                                                        <span class="text-bluegw-700 font-semibold">
+                                                            <a class="failedTestLink" href="/run-result/${testRunId}/test-result/${failedTest.id}">
+                                                                ${failedTest.info ? failedTest.info.substring(0, Math.min(failedTest.info.length, 100)) + (failedTest.info.length > 100 ? "..." : "") : ''}
+                                                            </a>
+                                                        </span>
+                                                        <br>
+                                                            <span class="ml-4">${failedTest.testCaseError.errorType ? failedTest.testCaseError.errorType + ':' : ''}</span>
+                                                            <span class="text-sm text-gray-600">${failedTest.testCaseError.message ? escape(failedTest.testCaseError.message) : ''}</span>
+                                                    </span>
+                                                </li>
+                                            `).join("")}
+                                        </ul>
+                                    </fieldset>
+                                    <fieldset>
+                                        <ul class="list-none p-0 m-0 groupedByError">
+                                            ${Object.entries(failedTestsByMessageLists).map(([key, failedTestsByMessageList]) => `
+                                                <li class="bg-white hover:bg-gray-100 border-b border-gray-200 mb-4 p-4">
+                                                    <div class="p-4">
+                                                        <span class="text-bluegw-700 font-semibold">${failedTestsByMessageList[0].testCaseError.errorType ? failedTestsByMessageList[0].testCaseError.errorType + ':' : ''}</span>
+                                                        <span>${key ? escape(key) : ''}</span>
+                                                        <ul>
+                                                            ${failedTestsByMessageList.map(failedTest => `
+                                                                <li class="ml-2 mt-2">
+                                                                    <p class="text-bluegw-700 ">
+                                                                        <a class="ml-4 failedTestLink" href="/run-result/${testRunId}/test-result/${failedTest.id}" title="${failedTest.info ? failedTest.info : ''}">
+                                                                            ${failedTest.info ? failedTest.info.substring(0, Math.min(failedTest.info.length, 95)) + (failedTest.info.length > 95 ? "..." : "") : ''}
+                                                                        </a>
+                                                                    </p>
+                                                                    <div>
+                                                                                <span class="text-sm text-gray-600">${failedTest.testCaseError.url || ''}</span>
+                                                                    </div>
+                                                                </li>
+                                                            `).join("")}
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                            `).join("")}
+                                        </ul>
+                                    </fieldset>
+                                </div>
+                            `;
+            panelElement.innerHTML = panelContent;
+            countElement.innerText = 'Failed: ' + failedTests.length;
+            showSection('listAll');
+        }
+
+        function updatePassedPanel(testRunId, panelElement, data, countElement) {
+            let panelContent = `
+                            <ul id="passed-tests" class="w-full mb-2 bg-white rounded-md overflow-hidden">
+                                ${data.map(testSuite => `
+                                    <li class="bg-white hover:bg-gray-100 border-b border-gray-200 mb-4 p-4 ">
+                                        <a class="text-bluegw-700 font-semibold" href="/run-result/${testRunId}/test-result/${testSuite.id}">
+                                            ${testSuite.info.substring(0, Math.min(testSuite.info.length, 100)) + (testSuite.info.length > 100 ? "..." : "")}
+                                        </a>
+                                    </li>
+                                `).join("")}
+                                </ul>
+                            `;
+            panelElement.innerHTML = panelContent;
+            countElement.innerText = 'Passed: ' + data.length;
+        }
+
+        function updateQueuedPanel(testRunId, panelElement, data, countElement) {
+            const panelContent = `
+                                <ul id="queued-tests" class="w-full mb-2 bg-white rounded-md overflow-hidden">
+                                    ${data.map(item => {
+                return `
+                                            <li class="bg-white hover:bg-gray-100 border-b border-gray-200 mb-4 p-4">
+                                                <a class="text-bluegw-700 font-semibold">
+                                                    ${item.info}
+                                                </a>
+                                            </li>`;
+            }).join("")}
+                                </ul>`;
+            panelElement.innerHTML = panelContent;
+            countElement.innerText = `Queued: ${data.length}`;
+        }
+
+        function updateBlockedPanel(testRunId, panelElement, data, countElement) {
+            const panelContent = `
+                                <ul id="blocked-tests" class="w-full mb-2 bg-white rounded-md overflow-hidden">
+                                    ${data.map(testSuite => {
+                return `
+                                            <li class="bg-white hover:bg-gray-100 border-b border-gray-200 mb-4 p-4">
+                                                <a class="text-bluegw-700 font-semibold">
+                                                    ${testSuite.info}
+                                                </a>
+                                            </li>`;
+            }).join("")}
+                                </ul>`;
+            panelElement.innerHTML = panelContent;
+            countElement.innerText = `Blocked: ${data.length}`;
+        }
+
+        function updateStartedPanel(testRunId, panelElement, data, countElement) {
+            const panelContent = `
+                                <ul id="started-tests" class="w-full mb-2 bg-white rounded-md overflow-hidden">
+                                            ${data.map(testSuite => {
+                return `
+                                            <li class="bg-white hover:bg-gray-100 border-b border-gray-200 mb-4 p-4">
+                                                <a class="text-bluegw-700 font-semibold">
+                                                                     ${testSuite.info}
+                                                </a>
+                                            </li>`;
+            }).join("")}
+                                </ul>`;
+            panelElement.innerHTML = panelContent;
+            countElement.innerText = `Started: ${data.length}`;
+        }
+
+    </script>
+
+}*@

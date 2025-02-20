@@ -1,0 +1,5 @@
+﻿@model QAPDashboard.Views.Shared.Components.Checkbox.CheckboxViewModel
+
+<label for="@Model.Id" class="mb-2 text-base font-medium text-gray-900 dark:text-gray-300">@Model.Label</label>
+<input type="checkbox" id="@Model.Id" value="@Model.Value" class="w-1/7 px-4 py-2 text-sm text-slate-700 text-center">
+<input type="hidden" id="@($"{Model.Id}_hidden")" name="@Model.Name" value="false">

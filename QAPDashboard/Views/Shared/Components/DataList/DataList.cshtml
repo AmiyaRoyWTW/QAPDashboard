@@ -1,0 +1,17 @@
+﻿@model QAPDashboard.Views.Shared.Components.DataList.DataListViewModel
+
+@if (Model != null)
+{
+    <div>
+        <label for="@Model.Id" class="mb-2 block text-sm font-medium text-gray-700">URL</label>
+        <input id="@Model.Id" name="@Model.Name" list="@Model.ListId" type="text" class="mb-4 w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-300 focus:outline-none" />
+        <datalist id="@Model.ListId">
+            @foreach (var url in Model.Options)
+            {
+                <option value="@url">@url</option>
+            }
+        </datalist>
+    </div>
+}
+
+

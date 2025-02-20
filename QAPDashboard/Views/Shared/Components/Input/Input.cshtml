@@ -1,0 +1,5 @@
+﻿@model QAPDashboard.Views.Shared.Components.Input.InputViewModel
+
+<label for="@Model.Id" class="mb-2 block text-base font-medium text-gray-700">@Model.Label</label>
+<input id="@Model.Id" name="@Model.Name" type="number" class="mb-4 w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-300 focus:outline-none" value="@Model.Value" min="@Model.Min" max="@Model.Max" @(Model.Enabled ? "" : "disabled") />
+

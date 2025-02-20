@@ -1,0 +1,37 @@
+﻿@model TestResultViewModel
+
+@{
+    Layout = "";
+}
+
+@{
+    @foreach (var testResult in @Model.ResultList)
+    {
+        <tr class="lastResultsRow">
+            <td class="failedTestRow">
+                @if (testResult.Status == "Failed")
+                {
+                    <div id="testLogoWrapper">
+                        <img class="resultIcon" alt="Failed Test Icon Small" title="Failed Test Icon Small" src="~/images/failedTestIconSmall.png" />
+                        <span class="lastResultTestName"><a target="_blank" class="failedTestLink" href="/run-result/@testResult.PartitionKey/test-result/@testResult.Id">@(@testResult.Info.Substring(0, Math.Min(@testResult.Info.Length, 100)))@(@testResult.Info.Length > 100 ? "..." : "")</a></span>
+                    </div>
+                    <span class="resultTime">@testResult.EndTime.ToLocalTime()</span>
+                    <br />
+                    <span class="failedType">@testResult.TestCaseError.ErrorType</span>
+                    <br />
+                    <span class="failedText">@testResult.TestCaseError.Message</span>
+                }
+                else if (testResult.Status == "Passed")
+                {
+                    <div id="testLogoWrapper">
+                        <img class="resultIcon" alt="Failed Test Icon Small" title="Failed Test Icon Small" src="~/images/passedTestIconSmall.png" />
+                        <span class="lastResultTestName"><a target="_blank" class="failedTestLink" href="/run-result/@testResult.PartitionKey/test-result/@testResult.Id">@(@testResult.Info.Substring(0, Math.Min(@testResult.Info.Length, 100)))@(@testResult.Info.Length > 100 ? "..." : "")</a></span>
+                    </div>
+                    <span class="resultTime">@testResult.EndTime.ToLocalTime()</span>
+                    <br />
+                    <br />
+                }
+            </td>
+        </tr>
+    }
+}

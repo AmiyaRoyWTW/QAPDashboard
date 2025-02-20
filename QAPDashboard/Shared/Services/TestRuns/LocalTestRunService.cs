@@ -1,0 +1,67 @@
+﻿using Newtonsoft.Json;
+using QAPDashboard.Shared.Configurations;
+using QAPDashboard.Shared.Models.Twillio;
+
+namespace QAPDashboard.Shared.Services.TestRuns
+{
+
+    public interface ILocalTestRunService
+    {
+        List<Runs> GetLocalTestRuns();
+    }
+    public class LocalTestRunService : ILocalTestRunService
+    {
+        public List<Runs> GetLocalTestRuns()
+        {
+            List<Runs> runs = [];
+            var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
+            foreach (var resultDirectory in resultDirectories)
+            {
+                var testStats = GetTestStats(resultDirectory);
+                runs.Add(new Runs
+                {
+                    RunName = resultDirectory.Split("\\").ToList().Last(),
+                    Result = GetTestStatus(resultDirectory),
+                    Date = testStats?.DateCreated ?? DateTime.MinValue,
+                    Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
+                    CallingNumber = testStats?.CallingNumber ?? "",
+                    CalledNumber = testStats?.CalledNumber ?? ""
+                });
+            }
+            return runs;
+        }
+
+        public string GetTestStatus(string resultPath)
+        {
+            string status = "Failed";
+            var testResults = Directory.GetFiles(resultPath).Where(x => x.EndsWith("callstatus.json")).FirstOrDefault();
+            if (testResults != null)
+            {
+                var callStatus = JsonConvert.DeserializeObject<CallStatus>(File.ReadAllText(testResults));
+                if (callStatus != null)
+                {
+                    status = callStatus.Status.ToLower() switch
+                    {
+                        "inprogress" => "In Progress",
+                        "passed" => "Success",
+                        "failed" => "Failed",
+                        "error" => "Errored",
+                        _ => "Unknown",
+                    };
+                }
+            }
+            return status;
+        }
+
+        public CallResponse? GetTestStats(string resultPath)
+        {
+            CallResponse? callResponseStats = null;
+            var callResponse = Directory.GetFiles(resultPath).Where(x => x.EndsWith("callresponse.json")).FirstOrDefault();
+            if (callResponse != null)
+            {
+                callResponseStats = JsonConvert.DeserializeObject<CallResponse>(File.ReadAllText(callResponse));
+            }
+            return callResponseStats;
+        }
+    }
+}

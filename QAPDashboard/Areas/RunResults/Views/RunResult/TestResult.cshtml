@@ -1,0 +1,322 @@
+﻿@model TestResultViewModel
+
+@{
+    ViewData["Title"] = "Test Call Details: " + @Model.TestId;
+}
+
+<div class="container mx-auto">
+    <div id="presets" class="mt-8 text-slate-700 rounded p-4 ">
+        <h2 class="text-3xl mb-4">Test Case Run Details</h2>
+        <div class=" bg-white border border-gray-300 ">
+           
+        <div class="px-8  rounded md:flex md:space-x-8 ">
+           
+            <div class="md:w-3/5">
+                <div class="lg:flex">
+                    <div id="RunDetailData" class="bg-white p-4 rounded-lg ">
+                        <div class="mt-2">
+                            <ul class=" py-2 px-4 text-left font-medium leading-none border-bluegw-800 divide-y divide-bluegw-100">
+                                 <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-bluegw-900 " href="#">
+                                        <p>
+                                            - Test Case ID:
+                                            <span class="font-normal text-gray-500 text-sm">@Model.TestId</span>
+                                        </p>
+                                    </div>
+                                </li>
+                                 <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-bluegw-900 " href="#">
+                                        <p>
+                                            - Test Suite:
+                                            <span class="font-normal text-gray-500 text-sm">@Model.TestSuite.Name</span>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-bluegw-900 " href="#">
+                                        <p>
+                                            - Test Type:
+                                            <span class="font-normal text-gray-500 text-sm">@Model.TestSuite.Type</span>
+                                        </p>
+                                    </div>
+                                </li>
+                                  <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-bluegw-900 " href="#">
+                                        <p>
+                                            - Test Case:
+                                            <span class="font-normal text-gray-500 text-sm">@Model.Method</span>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-bluegw-900 " href="#">
+                                        <p>
+                                            - Result:
+                                            <span class="font-semibold @(Model.Status == "Failed" ? "text-red-500" : "text-green-500") text-sm uppercase ">@Model.Status</span>
+                                        </p>
+                                    </div>
+                                </li>
+                               
+                                <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-bluegw-900" href="#">
+                                        <p>
+                                            - Start Date:
+                                            <span class="font-normal text-gray-500 text-sm">@Model.StartTime</span>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-blue-700" href="#">
+                                       
+                                        <p>
+                                            - End Date:
+                                            <span class="font-normal text-gray-500 text-sm">@Model.EndTime</span>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-blue-700 " href="#">
+                                        
+                                        <p>
+                                            - Attempts:
+                                            <span class="font-normal text-gray-500 text-sm">@Model.Attempts</span>
+                                        </p>
+                                    </div>
+                                </li>
+                              
+
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+                <div class="md:w-2/5 flex items-center justify-center">
+                    @if (@Model.Status == "Failed")
+                    {
+                        <ul class="py-2 px-4 mt-6 text-left font-medium leading-none border-bluegw-800 divide-y divide-bluegw-100">
+                            <li>
+                                <div class="py-2 w-full flex items-center text-bluegw-700 hover:text-bluegw-900" href="#">
+                                    <p>
+                                        - Error Screenshot:
+                                    </p>
+                                </div>
+                            </li>
+                            <li>
+                                <div id="screenshotDiv" class="p-2">
+                                    <!-- Set width and height to 100% -->
+                                    <img id="failedTestScreenShot" class="failedScreenshot w-full h-auto" src="data:image/gif;base64,@Model.ScreenshotBase64" alt="failedScreenshot" />
+                                </div>
+                            </li>
+                        </ul>
+                    }
+
+                 
+                </div>
+
+
+        </div>
+        </div>
+
+        <h2 class="text-3xl mt-8">Error Details </h2>
+
+
+        <div class="mt-4 border border-gray-300 rounded bg-white overflow-y-auto max-h-[400px]">
+            <div class="px-4">
+                <div id="testDetailWrapper">
+                    <table id="testInfoTable">
+                        <tbody>
+                            <tr>
+                                @if (@Model.DataTrees != null)
+                                {
+                                    <td>
+                                        <div id="dataResults" class="text-blue-500 font-semibold">Test Data</div>
+                                    </td>
+                                }
+                                @if (ViewBag.AppType == "dashboard")
+                                {
+                                    <td>
+                                        <div id="lastResults" class="text-blue-600 font-semibold">Past Results</div>
+                                    </td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+
+                        @if (@Model.Status == "Failed")
+                        {
+                            <div class="rounded-lg " >
+                                <ul class="w-full mb-2 bg-white rounded-md overflow-hidden">
+                                <li class="bg-white hover:bg-gray-100 border-b border-gray-200 p-4">
+                                    <span class="text-bluegw-700 font-semibold">
+                                        Page Title
+                                    </span>
+                                    <br />
+                                    <span class="dataValue">@Model.PageTitle</span>
+                                </li>
+                                <li class="bg-white hover:bg-gray-100 border-b border-gray-200 p-4">
+                                    <span class="text-bluegw-700 font-semibold">
+                                        URL
+                                    </span>
+                                    <br />
+                                    <span class="dataValue">@Model.Url</span>
+                                </li>
+                                        <li class="bg-white hover:bg-gray-100 border-b border-gray-200  p-4">
+                                            <span class="text-bluegw-700 font-semibold">
+                                            Error Type
+                                            </span>
+                                        <br />
+                                            <span class="dataValue">@Model.ErrorType</span>
+                                        </li>
+                                    <li class="bg-white hover:bg-gray-100 border-b border-gray-200 p-4">
+                                        <span class="text-bluegw-700 font-semibold">
+                                            Message
+                                        </span>
+                                        <br />
+                                        <span class="dataValue">@Model.Message</span>
+                                    </li>
+                             
+                                    <li class="bg-white hover:bg-gray-100 border-b border-gray-200 p-4">
+                                        <span class="text-bluegw-700 font-semibold">
+                                            Trace
+                                        </span>
+                                        <span class="dataValue">
+                                            <br />
+                                        @foreach (var traceEntry in @Model.Trace)
+                                        {
+                                           
+                                            @Html.Raw(traceEntry)
+
+                                     
+                                            <br />
+                                        }
+                                        </span>
+                                    </li>
+                                  
+                                </ul>
+                            </div>
+                        }
+                        else if (@Model.Status == "Passed")
+                        {
+                            <span class="detailHeader text-blue-600 font-semibold">No errors found!</span>
+                            <br />
+          
+                        }
+              
+
+                    @if (Model.AppType == "dashboard")
+                    {
+                        <fieldset class="hidden border p-3 mb-3" id="lastResultsField">
+                            <span class="detailHeader text-blue-200 font-semibold">Last 3 Days Against Same Environment</span>
+                            <input id="getLastTestResults" class="runDataButtons bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" value="Generate Test Results" type="button" />
+                            <table id="lastResultTable" class="table table-bordered">
+                                <!-- Add table content here -->
+                            </table>
+                        </fieldset>
+                    }
+
+                    @if (@Model.DataTrees != null)
+                    {
+                        <fieldset class=" border p-3 mb-3" id="dataResultsField">
+                            <div id="dataGenerationDiv">
+                                <div id="dataGenerationButtons">
+                                    <input id="expandAllDataGen" class="dataGenExpandButton bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" value="Expand All Data" type="button" />
+                                    <input id="collapseAllDataGen" class="dataGenCollapseButton bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" value="Collapse All Data" type="button" />
+                                </div>
+                                <ul id="testDataList">
+                                    @foreach (var dataTree in @Model.DataTrees)
+                                    {
+                                        <partial name="_TestResultTestData" model="dataTree" />
+                                    }
+                                </ul>
+                            </div>
+                        </fieldset>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts
+    {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('failedTestScreenShot').addEventListener("click", clickBase64ImageInNewTab_eventListener);
+        });
+
+
+        async function getPreviousResults() {
+            var url = "/test-result/Previous?testSuite=@Model.TestSuite&testMethod=@Model.Method&baseURL=@Model.BaseUrl&testStartTime=@Model.StartTime";
+
+            document.getElementById('getLastTestResults').disabled = true;
+            document.getElementById('lastResultTable').innerHTML = "<img class='loadingIcon' alt='loadingIcon' title='loading Image' src='/images/loading.gif' />";
+
+            await fetch(url)
+                .then(data => { return data.text() })
+                .then(res => { populatePreviousTestResults(res) });
+        }
+
+        function populatePreviousTestResults(previousTestHTML) {
+            document.getElementById('lastResultTable').innerHTML = previousTestHTML;
+
+            document.getElementById('getLastTestResults').setAttribute("class", "hidden");
+        }
+
+        document.getElementById('getLastTestResults').addEventListener("click", getPreviousResults);
+
+        function clickUnselectedLegend_eventListener() {
+            document.querySelectorAll("#testInfoTable legend").forEach(function (elem) {
+                elem.setAttribute("class", "");
+            });
+            document.querySelectorAll("#testDetailWrapper fieldset").forEach(function (elem) {
+                elem.setAttribute("class", "hidden");
+            });
+            this.setAttribute("class", "selectedTab");
+            var id = this.getAttribute("id");
+            document.getElementById(id + "Field").setAttribute("class", "");
+        }
+
+        document.querySelectorAll('#testInfoTable legend').forEach(function (elem) {
+            elem.addEventListener("click", clickUnselectedLegend_eventListener);
+        });
+
+        function clickExpandAllBtn_eventListener() {
+            document.querySelectorAll("#dataGenerationDiv .plusImg").forEach(function (elem) {
+                elem.setAttribute("class", "plusImg hidden");
+            });
+            document.querySelectorAll("#dataGenerationDiv .minusImg").forEach(function (elem) {
+                elem.setAttribute("class", "minusImg");
+            });
+            document.querySelectorAll("#testDataList ul").forEach(function (elem) {
+                elem.setAttribute("class", "");
+            });
+        }
+        document.getElementById("expandAllDataGen").addEventListener("click", clickExpandAllBtn_eventListener);
+
+        function clickCollapseAllBtn_eventListener() {
+            document.querySelectorAll("#dataGenerationDiv .minusImg").forEach(function (elem) {
+                elem.setAttribute("class", "minusImg hidden");
+            });
+            document.querySelectorAll("#dataGenerationDiv .plusImg").forEach(function (elem) {
+                elem.setAttribute("class", "plusImg");
+            });
+            document.querySelectorAll("#testDataList ul").forEach(function (elem) {
+                elem.setAttribute("class", "hidden");
+            });
+        }
+        document.getElementById("collapseAllDataGen").addEventListener("click", clickCollapseAllBtn_eventListener);
+
+        function clickBase64ImageInNewTab_eventListener() {
+            const newWindow = window.open();
+            if (newWindow) {
+                const htmlContent = `<html><div> <img style="width: 100%; height:auto;" src="data:image/jpg;base64,@Model.ScreenshotBase64"/></div></html>`;
+                newWindow.document.write(htmlContent);
+            } else {
+                console.error("Unable to open a new window.");
+            }
+        }
+     </script>
+}

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationInsightsResourceId>/subscriptions/97be618a-4cf9-41dd-919c-3157b8e53635/resourceGroups/IM-SDET-PRACTICES/providers/microsoft.insights/components/IM-SDET-PRACTICES-APP-INSIGHTS</ApplicationInsightsResourceId>
+    <UserSecretsId>408d4ef7-8801-4ca8-a995-fb5dab8bf9b9</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1" />
+    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.19.1" />
+    <PackageReference Include="Azure.Storage.Queues" Version="12.19.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Hosted\" />
+    <Folder Include="Views\" />
+  </ItemGroup>
+
+</Project>

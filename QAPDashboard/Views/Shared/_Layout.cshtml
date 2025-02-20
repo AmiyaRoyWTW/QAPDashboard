@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QAP - Twillio Dashboard</title>
+
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="~/css/vanilla-dataTables.min.css" />
+    <script type="text/javascript" src="~/js/vanilla-dataTables.min.js"></script>
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"> *@
+    @RenderSection("AddedStyles", required: false)
+</head>
+
+<body class="bg-bluegw-50">
+    <div class="min-h-screen lg:flex lg:flex-row">
+        <div id="sideNav" class="min-h-screen max-w-xs lg:w-1/5 xl:w-1/6 bg-bluegw-800 hidden lg:block lg:visible">
+            <div class="p-4 space-y-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="300" height="60" viewBox="0 0 300 60">
+                    <text x="10" y="40" font-family="Arial" font-size="22" fill="#FFFFFF">Twillio Automation</text>
+                </svg>
+
+                @*@if (Model != null && Model.NavigationBar != null)
+                { 
+                    @foreach (var navigationLink in Model.NavigationBar)
+                    {
+                        if (navigationLink.Visible && (navigationLink.AppType.ToLower() == "all" || Model.AppType == navigationLink.AppType))
+                        {
+                            var paintClassIfIsCurrentUrl = navigationLink.Href == @Url.RouteUrl(ViewContext.RouteData.Values) ? "bg-bluegw-900 text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:scale-105 cursor-pointer transform-gpu transition-all" : "text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:scale-105 cursor-pointer transition-all";
+                            <div class="navAreas">
+                                <a class="@paintClassIfIsCurrentUrl group mb-2 mr-2 flex space-x-4 rounded-lg rounded-md px-4 px-7 py-2.5 py-3 text-white" href="@navigationLink.Href" onclick="hideSidebarOnSmallScreens()">@navigationLink.Name</a>
+                            </div>
+                        }
+                    }
+                }*@
+               
+            </div>
+        </div>
+
+        <div class="lg:flex-1 xl:flex-5 md:flex-2 sm:flex-1">
+@*             <nav id="topNav" class="border-b border-gray-300 bg-white">
+                <button id="menuBtn" class="lg:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </nav> *@
+
+            <div class="">@RenderBody()</div>
+        </div>
+    </div>
+
+    @RenderSection("Scripts", required: false)
+    <script>
+        // const menuBtn = document.getElementById('menuBtn');
+        const sideNav = document.getElementById('sideNav');
+
+        // menuBtn.addEventListener('click', () => {
+        //     sideNav.classList.toggle('hidden');
+        // });
+
+        function hideSidebarOnSmallScreens() {
+            if (window.innerWidth < 1024) { // Adjust the breakpoint as needed
+                sideNav.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+
+
+
+</html>

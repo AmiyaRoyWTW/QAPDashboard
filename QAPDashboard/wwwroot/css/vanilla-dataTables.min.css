@@ -1,0 +1,155 @@
+﻿.dataTable-wrapper.no-header .dataTable-container {
+    border-top: 1px solid #e0e0e0; /* Light gray border on top */
+}
+
+.dataTable-wrapper.no-footer .dataTable-container {
+    border-bottom: 1px solid #e0e0e0; /* Light gray border on bottom */
+}
+
+.dataTable-bottom, .dataTable-top {
+    padding: 10px 12px; /* Increased padding for better spacing */
+}
+
+    .dataTable-bottom > div:first-child, .dataTable-top > div:first-child {
+        float: left;
+    }
+
+    .dataTable-bottom > div:last-child, .dataTable-top > div:last-child {
+        float: right;
+    }
+
+.dataTable-selector {
+    padding: 8px 10px; /* Adjusted padding for input elements */
+    border: 1px solid #e0e0e0; /* Light gray border */
+    border-radius: 4px; /* Slightly rounded corners */
+}
+
+.dataTable-input {
+    width: 100%; /* Set the width to 100% to expand the input element */
+    padding: 4px 10px; /* Adjust the padding as needed */
+    border: 1px solid #e0e0e0; /* Light gray border */
+    border-radius: 4px; /* Slightly rounded corners */
+}
+
+.dataTable-info {
+    margin: 10px 0; /* Increased margin for spacing */
+}
+
+.dataTable-pagination ul {
+    margin: 0;
+    padding-left: 0;
+}
+
+.dataTable-pagination li {
+    list-style: none;
+    float: left;
+}
+
+.dataTable-pagination a {
+    border: 1px solid transparent;
+    float: left;
+    margin-left: 4px; /* Reduced margin between pagination links */
+    padding: 6px 10px;
+    position: relative;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px; /* Slightly rounded corners */
+    transition: background-color 0.2s;
+}
+
+    .dataTable-pagination a:hover {
+        background-color: #f0f0f0; /* Light gray background on hover */
+    }
+
+.dataTable-pagination .active a, .dataTable-pagination .active a:focus, .dataTable-pagination .active a:hover {
+    background-color: #f0f0f0;
+    cursor: default;
+}
+
+.dataTable-pagination .disabled a, .dataTable-pagination .disabled a:focus, .dataTable-pagination .disabled a:hover, .dataTable-pagination .ellipsis a {
+    cursor: not-allowed;
+}
+
+    .dataTable-pagination .disabled a, .dataTable-pagination .disabled a:focus, .dataTable-pagination .disabled a:hover {
+        opacity: 0.6; /* Reduced opacity for disabled links */
+    }
+
+.dataTable-pagination .pager a {
+    font-weight: 700;
+}
+
+/*.dataTable-table {
+    max-width: 100%;
+    width: 100%;
+    border-spacing: 0;
+    border: 1px solid #e0e0e0;*/ /* Add a light gray border to the table */
+    /*border-radius: 4px;*/ /* Slightly rounded corners */
+/*}
+
+    .dataTable-table > tbody > tr > td, .dataTable-table > tbody > tr > th, .dataTable-table > tfoot > tr > td, .dataTable-table > tfoot > tr > th, .dataTable-table > thead > tr > td, .dataTable-table > thead > tr > th {
+        vertical-align: top;
+        padding: 10px 12px;*/ /* Adjusted padding for table cells */
+        /*border-bottom: 1px solid #e0e0e0;*/ /* Light gray border for table rows */
+    /*}
+
+    .dataTable-table th, .dataTable-table > tfoot > tr > th, .dataTable-table > thead > tr > th {
+        vertical-align: bottom;
+        text-align: left;
+        font-weight: 600;*/ /* Slightly bolder font for header cells */
+    /*}
+
+    .dataTable-table > thead > tr > th {
+        background-color: #f0f0f0;*/ /* Light gray background for header row */
+    /*}
+
+    .dataTable-table > tfoot > tr > th {
+        background-color: #f0f0f0;*/ /* Light gray background for footer row */
+    /*}
+
+    .dataTable-table th a {
+        text-decoration: none;
+        color: inherit;
+    }*/
+
+.dataTable-sorter {
+    display: inline-block;
+    height: 100%;
+    position: relative;
+    width: 100%;
+}
+
+    .dataTable-sorter::after, .dataTable-sorter::before {
+        content: "";
+        height: 0;
+        width: 0;
+        position: absolute;
+        right: 4px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        opacity: .2
+    }
+
+    .dataTable-sorter::before {
+        border-top: 4px solid #000;
+        bottom: 10px
+    }
+
+    .dataTable-sorter::after {
+        border-bottom: 4px solid #000;
+        border-top: 4px solid transparent;
+        top: 0
+    }
+
+.asc .dataTable-sorter::after, .desc .dataTable-sorter::before {
+    opacity: 0.6;
+}
+
+.dataTables-empty {
+    text-align: center;
+}
+
+.dataTable-bottom::after, .dataTable-top::after {
+    clear: both;
+    content: " ";
+    display: table;
+}

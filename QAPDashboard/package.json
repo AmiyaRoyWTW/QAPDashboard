@@ -1,0 +1,16 @@
+{
+  "name": "qapdashboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "css:build": "npx tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/styles.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "apexcharts": "^3.54.1",
+    "tailwindcss": "^4.0.6"
+  }
+}

@@ -1,0 +1,24 @@
+﻿@model QAPDashboard.Views.Shared.Components.ButtonGroup.ButtonGroupViewModel
+
+<div class="h-18 inline-flex flex-col rounded-md p-4 shadow-sm md:flex-row justify-center" role="group">
+    @if (Model != null && Model.Buttons != null)
+    {
+        @for (var i = 0; i < Model.Buttons.Count; i++)
+        {
+            var button = Model.Buttons[i];
+            var isFirst = i == 0;
+            var isLast = i == Model.Buttons.Count - 1;
+            var borderRadiusClass = isFirst ? "md:rounded-l-lg" : isLast ? "md:rounded-r-lg" : "";
+
+            <button id="@button.Id" type="button" class="inline-flex transform items-center border border-bluegw-800 bg-bluegw-800 px-4 py-2 text-xs font-medium text-white transition-transform duration-75 ease-in-out hover:scale-105 hover:bg-bluegw-900 hover:text-white focus:z-10 active:border-white @borderRadiusClass">
+                @if (!string.IsNullOrWhiteSpace(button.Svg))
+                {
+                    <div class="mr-2 h-5 w-5">
+                        <img src="@Url.Content(button.Svg)" />
+                    </div>
+                }
+                @button.Name
+            </button>
+        }
+    }
+</div>
