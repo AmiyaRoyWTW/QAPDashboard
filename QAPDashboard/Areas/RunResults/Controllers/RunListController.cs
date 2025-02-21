@@ -28,7 +28,6 @@ namespace QAPDashboard.Areas.RunResults.Controllers
                     // Handle the case where both startDate and endDate are provided.
                     // You can process the parameters and build the view model accordingly.
                     // For example, you can use the builderParameters approach you mentioned.
-                    _logger.LogDebug("Coming to RunList");
                     AddVMBuilderParameter("url", url);
                     AddVMBuilderParameter("startDate", startDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmssfffffff"));
                     AddVMBuilderParameter("endDate", endDate.Value.ToUniversalTime().AddDays(1).AddTicks(-1).ToString("yyyyMMddHHmmssfffffff"));

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Globalization;
+using Newtonsoft.Json;
 using QAPDashboard.Shared.Configurations;
 using QAPDashboard.Shared.Models.Twillio;
 
@@ -8,6 +9,7 @@ namespace QAPDashboard.Shared.Services.TestRuns
     public interface ILocalTestRunService
     {
         List<Runs> GetLocalTestRuns();
+        List<Runs> GetLocalTestRuns(string startDate = "", string endDate = "");
     }
     public class LocalTestRunService : ILocalTestRunService
     {
@@ -29,6 +31,39 @@ namespace QAPDashboard.Shared.Services.TestRuns
                 });
             }
             return runs;
+        }
+
+        public List<Runs> GetLocalTestRuns(string startDate = "", string endDate = "")
+        {
+            DateTime? parsedStartDate = string.IsNullOrEmpty(startDate)
+                ? null
+                : DateTime.ParseExact(startDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).AddDays(-1).Date;
+
+            DateTime? parsedEndDate = string.IsNullOrEmpty(endDate)
+                ? null
+                : DateTime.ParseExact(endDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).AddDays(1).Date;
+            List<Runs> runs = [];
+            var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
+            foreach (var resultDirectory in resultDirectories)
+            {
+                var testStats = GetTestStats(resultDirectory);
+                if (testStats?.DateCreated > parsedStartDate && testStats.DateCreated < parsedEndDate)
+                {
+                    lock (runs)
+                    {
+                        runs.Add(new Runs
+                        {
+                            RunName = resultDirectory.Split("\\").ToList().Last(),
+                            Result = GetTestStatus(resultDirectory),
+                            Date = testStats?.DateCreated ?? DateTime.MinValue,
+                            Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
+                            CallingNumber = testStats?.CallingNumber ?? "",
+                            CalledNumber = testStats?.CalledNumber ?? ""
+                        });
+                    }
+                }
+            }
+            return [.. runs.OrderByDescending(run => run.Date)];
         }
 
         public string GetTestStatus(string resultPath)

@@ -127,6 +127,10 @@ namespace QAPDashboard.Shared.Configurations
 
         private static void ValidateStorageArgs()
         {
+            if (RunnerConfiguration.StorageType == "local")
+            {
+                return;
+            }
             RunnerConfiguration.AZStorageAccount = RunnerConfiguration.AZStorageConnectionString.Split(";")[1].Split("=")[1];
             RunnerConfiguration.AZStorageKey = RunnerConfiguration.AZStorageConnectionString.Split(";")[2].Split("=")[1];
             RunnerConfiguration.AZStorageRunSummaryBlobContainer = "qaprunsummaryblobcontainer";

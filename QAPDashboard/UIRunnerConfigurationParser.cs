@@ -37,7 +37,7 @@ namespace QAPDashboard
             RunnerConfiguration.DashboardPort = 5000;
             RunnerConfiguration.LoggingAPIUrl = "http://automation.grpeapp.com";
             RunnerConfiguration.ApplicationType = "local";
-            //RunnerConfiguration.AZStorageConnectionString = configuration["AzureBlobStorage:ConnectionString"];
+            RunnerConfiguration.AZStorageConnectionString = configuration["AzureBlobStorage:ConnectionString"] ?? string.Empty;
         }
     }
 }

@@ -32,13 +32,13 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
             string startDate = GetBuilderParameterValue("startDate");
             string endDate = GetBuilderParameterValue("endDate");
             //IEnumerable<string> testRuns = _localTestRunService.GetLocalTestRuns(url, startDate, endDate);
-            IEnumerable<Runs> testRuns = _localTestRunService.GetLocalTestRuns();
+            IEnumerable<Runs> testRuns = _localTestRunService.GetLocalTestRuns(startDate, endDate);
 
             // Materialize the IEnumerable<TestRun> into a list
             List<Runs> testRunsList = [.. testRuns];
 
             // Modify the StartTime property of each TestRun
-            //testRunsList.ForEach(x => x.StartTime = x.StartTime.ToLocalTime());
+            testRunsList.ForEach(x => x.Date = x.Date.ToLocalTime());
 
             RunListViewModel runListVM = new()
             {
