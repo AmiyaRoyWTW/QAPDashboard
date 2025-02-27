@@ -45,6 +45,30 @@
             </tbody>
         </table>
 
+        <h2 class="text-3xl mb-4">Call Recording</h2>
+        <script type="module" src="https://cdn.jsdelivr.net/npm/player.style/tailwind-audio/+esm"></script>
+        <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js"></script>
+        @*<media-theme-tailwind-audio>
+            <audio
+                slot="media"
+                src=URL.cre@Model.AudioFile
+                playsinline
+                crossorigin
+            ></audio>
+        </media-theme-tailwind-audio>*@
+
+        <div class="flex flex-col items-center space-y-4">
+            <!-- Audio Player -->
+            <audio id="audio-player" class="w-64" controls>
+                <source id="audio-source" src="" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+
+            <button id="load-audio-btn" onclick="playAudio('@Model.RunId')" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" disabled>
+                Play Audio
+            </button>
+        </div>
+
         <h2 class="text-3xl mb-4">Step Details</h2>
         <table id="runsTable" class="w-full bg-white mt-4 table-auto">
             <thead class="bg-bluegw-100 text-slate-700">
@@ -79,6 +103,54 @@
         </table>
     </div>
 </div>
+
+
+@section Scripts
+{
+    <script>
+        window.onload = async function loadAudio(runId) {
+            try {
+                const audioPlayButton = document.getElementById('load-audio-btn');
+                //audioPlayButton.disabled = true;
+                // Fetch audio file from the backend
+                const url = `/api/audio?runId=${runId}`;
+                const response = await fetch(url);
+
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error('Failed to fetch audio.');
+                }
+
+                // Convert the response into a blob
+                const audioBlob = await response.blob();
+
+                // Create an object URL from the audio Blob
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                // Get the audio element and update its source
+                const audioPlayer = document.getElementById('audio-player');
+                const audioSource = document.getElementById('audio-source');
+                audioSource.src = audioUrl;
+
+                // Reload the audio player to update the source and play
+                audioPlayer.load();
+                //audioPlayer.play();
+                audioPlayButton.disabled = false;
+            } catch (error) {
+                console.error('Error loading audio:', error);
+            }
+        }
+
+        async function playAudio(runId) {
+            try {
+                const audioPlayer = document.getElementById('audio-player');
+                audioPlayer.play();
+            } catch (error) {
+                console.error('Error loading audio:', error);
+            }
+        }
+    </script>
+}
 
 @*@section Scripts
 {

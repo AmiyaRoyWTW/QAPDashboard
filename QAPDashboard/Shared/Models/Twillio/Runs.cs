@@ -10,5 +10,6 @@
         public string Duration { get; set; } = "00:00:00";
         public string AudioFile { get; set; } = String.Empty;
         public string DetailedResults { get; set; } = String.Empty;
+        public string AudioFileName { get; set; } = String.Empty;
     }
 }

@@ -38,6 +38,8 @@ namespace QAPDashboard
             RunnerConfiguration.LoggingAPIUrl = "http://automation.grpeapp.com";
             RunnerConfiguration.ApplicationType = "local";
             RunnerConfiguration.AZStorageConnectionString = configuration["AzureBlobStorage:ConnectionString"] ?? string.Empty;
+            RunnerConfiguration.TwilioAccountSid = configuration["Twilio:AccountSid"] ?? string.Empty;
+            RunnerConfiguration.TwilioAuthToken = configuration["Twilio:AuthToken"] ?? string.Empty;
         }
     }
 }

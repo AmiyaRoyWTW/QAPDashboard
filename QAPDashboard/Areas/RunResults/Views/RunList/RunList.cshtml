@@ -63,7 +63,13 @@
                 @run.Result
               </div>
             </td>
-            <td class="p-4 border border-gray-300">@run.AudioFile</td>
+            <td class="p-4 border border-gray-300">
+              <button type="button" id="audiodownload" class="text-blue bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onclick="downloadAudio('@run.RunName', '@run.AudioFileName')">
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
+                </svg>
+              </button>
+            </td>
           </tr>
         }
       </tbody>
@@ -210,6 +216,56 @@
       checkboxes.forEach((checkbox) => {
         checkbox.addEventListener('change', (event) => handleCheckboxChange(event, chart));
       });
+    }
+  </script>
+
+  @*<script src="https://unpkg.com/axios/dist/axios.min.js"></script>*@
+  <script>
+    /*function startDownload(audioUrl, audioFileName) {
+      axios({
+        url: audioUrl,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'audio/x-wav',
+          'Authorization': 'Basic ' + btoa(':'),
+        },
+        responseType: 'arraybuffer',
+      }).then((response) => {
+        if(response.status === 200) {
+          const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/x-wav' }));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', audioFileName);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        }
+        else{
+          console.log('Error');
+        }
+      }).catch((error) => {
+        console.log(error);
+      });
+    }*/
+
+    async function downloadAudio(runName, audioFileName){
+      const apiUrl = `/api/audio?runId=${runName}`;
+      const response = await fetch(apiUrl);
+
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error('Failed to fetch audio.');
+      }
+      const audioBlob = await response.blob();
+      const url = window.URL.createObjectURL(audioBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', audioFileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     }
   </script>
 }

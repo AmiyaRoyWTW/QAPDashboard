@@ -131,8 +131,23 @@ namespace QAPDashboard.Shared.Configurations
             {
                 return;
             }
-            RunnerConfiguration.AZStorageAccount = RunnerConfiguration.AZStorageConnectionString.Split(";")[1].Split("=")[1];
-            RunnerConfiguration.AZStorageKey = RunnerConfiguration.AZStorageConnectionString.Split(";")[2].Split("=")[1];
+            if (RunnerConfiguration.AZStorageConnectionString != null)
+            {
+                var connectionStringParts = RunnerConfiguration.AZStorageConnectionString.Split(";");
+                if (connectionStringParts.Length > 2)
+                {
+                    RunnerConfiguration.AZStorageAccount = connectionStringParts[1].Split("=")[1];
+                    RunnerConfiguration.AZStorageKey = connectionStringParts[2].Split("=")[1];
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid AZStorageConnectionString format.");
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(RunnerConfiguration.AZStorageConnectionString), "AZStorageConnectionString cannot be null.");
+            }
             RunnerConfiguration.AZStorageRunSummaryBlobContainer = "qaprunsummaryblobcontainer";
             RunnerConfiguration.AZStorageExecutedTestsBlobContainer = "qapexecutedtestsblobcontainer";
             RunnerConfiguration.AZStorageTestDataBlobContainer = "qaprunstestdatablobcontainer";
