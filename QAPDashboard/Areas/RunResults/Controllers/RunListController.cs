@@ -19,19 +19,19 @@ namespace QAPDashboard.Areas.RunResults.Controllers
             _logger = logger;
         }
         [HttpGet, Route("")]
-        public IActionResult? RunList(string url, DateTime? startDate = null, DateTime? endDate = null)
+        public IActionResult? RunList(string url, DateTime? startDate = null, DateTime? endDate = null, string testCaseFilter = "All", string dateRangeFilter = "This Month")
         {
             try
             {
-                if (startDate.HasValue && endDate.HasValue)
+                if (testCaseFilter != "All" || dateRangeFilter != "This Month")
                 {
-                    // Handle the case where both startDate and endDate are provided.
-                    // You can process the parameters and build the view model accordingly.
-                    // For example, you can use the builderParameters approach you mentioned.
-                    AddVMBuilderParameter("url", url);
-                    AddVMBuilderParameter("startDate", startDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmssfffffff"));
-                    AddVMBuilderParameter("endDate", endDate.Value.ToUniversalTime().AddDays(1).AddTicks(-1).ToString("yyyyMMddHHmmssfffffff"));
-
+                    AddVMBuilderParameter("testCaseFilter", testCaseFilter);
+                    AddVMBuilderParameter("dateRangeFilter", dateRangeFilter);
+                    if (startDate.HasValue && endDate.HasValue)
+                    {
+                        AddVMBuilderParameter("startDate", startDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmssfffffff"));
+                        AddVMBuilderParameter("endDate", endDate.Value.ToUniversalTime().AddDays(1).AddTicks(-1).ToString("yyyyMMddHHmmssfffffff"));
+                    }
                     RunListViewModel runListViewModel = _runListViewModeBuilder.Build(builderParameters);
                     return View(runListViewModel);
                 }

@@ -3,12 +3,6 @@
 
 @{
     ViewData["Title"] = "Test Results: " + @Model.RunId;
-    @*var ReRunUrl = "/runner";
-    if (Model.AppType == null || Model.AppType != "local")
-    {
-        ReRunUrl = "http://localhost:5000/runner";
-    }*@
-
 }
 
 @section AddedStyles
@@ -18,7 +12,7 @@
 }
 
 <div class="container mx-auto">
-    <div id="presets" class="mt-8 text-slate-700 rounded p-4 ">
+    <div id="callDetails" class="mt-8 text-slate-700 rounded p-4">
         <h2 class="text-3xl mb-4">Call Details</h2>
         <table id="runsTable" class="w-full bg-white  mt-4 table-auto">
             <thead class="bg-bluegw-100 text-slate-700">
@@ -44,8 +38,14 @@
                 </tr>
             </tbody>
         </table>
+    </div>
 
-        <h2 class="text-3xl mb-4">Call Recording</h2>
+    <div id="resultSummary" class="mt-8 text-slate-700 rounded p-4">
+
+    </div>
+
+    <div id="callRecordings" class="mt-8 text-slate-700 rounded p-4">
+        <h2 class="text-3xl mb-4">Call Recordings</h2>
         <script type="module" src="https://cdn.jsdelivr.net/npm/player.style/tailwind-audio/+esm"></script>
         <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js"></script>
         @*<media-theme-tailwind-audio>
@@ -64,11 +64,14 @@
                 Your browser does not support the audio element.
             </audio>
 
-            <button id="load-audio-btn" onclick="playAudio('@Model.RunId')" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" disabled>
+            <button id="load-audio-btn" onclick="playAudio('@Model.RunId')"
+                class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" disabled>
                 Play Audio
             </button>
         </div>
+    </div>
 
+    <div id="stepDetails" class="mt-8 text-slate-700 rounded p-4">
         <h2 class="text-3xl mb-4">Step Details</h2>
         <table id="runsTable" class="w-full bg-white mt-4 table-auto">
             <thead class="bg-bluegw-100 text-slate-700">

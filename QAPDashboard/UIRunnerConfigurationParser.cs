@@ -33,7 +33,7 @@ namespace QAPDashboard
             RunnerConfiguration.AllowedHosts = "localhost;enforcers1.liazon.corp;automation.grpeapp.com";
             RunnerConfiguration.StorageType = "local";
             RunnerConfiguration.FileStoragePath = "c:\\TwillioTestResults";
-            RunnerConfiguration.TestInventoryFileStoragePath = string.Format("{0}TestInventory", AppDomain.CurrentDomain.BaseDirectory);
+            RunnerConfiguration.TestInventoryFileStoragePath = "c:\\TwilioTestManagement";
             RunnerConfiguration.DashboardPort = 5000;
             RunnerConfiguration.LoggingAPIUrl = "http://automation.grpeapp.com";
             RunnerConfiguration.ApplicationType = "local";

@@ -1,43 +1,79 @@
 ﻿using Newtonsoft.Json;
+using QAPDashboard.Areas.RunResults.ViewModels;
 using QAPDashboard.Shared.Configurations;
 using QAPDashboard.Shared.Models.Twillio;
+using QAPDashboard.Shared.Services.TestRuns;
 
 namespace QAPDashboard.Shared.Services.TestCases
 {
 
     public interface ILocalTestCaseService
     {
-        List<TestStepStats> GetLocalTestSteps(string testName, string testId);
+        RunResultViewModel GetLocalTestResults(string testName, string testId);
     }
     public class LocalTestCaseService : ILocalTestCaseService
     {
-        public List<TestStepStats> GetLocalTestSteps(string testName, string testId)
+        public RunResultViewModel GetLocalTestResults(string testName, string testId)
         {
-            int stepCount = 1;
-            List<TestStepStats> testStepStats = [];
-            var pathName = Path.Combine(RunnerConfiguration.FileStoragePath, testName, testId);
+            List<StepViewModel> stepViewModels = [];
+            LocalTestRunService localTestRunService = new();
+            RunResultViewModel runResultViewModel = new();
+            var twilioTests = GetTestDetails(testName);
+            var twilioSteps = twilioTests?.TestSteps.OrderBy(x => x.Id).ToList();
             var stepFiles = Directory.GetFiles(Path.Combine(RunnerConfiguration.FileStoragePath, testName, testId)).Where(x => !(x.EndsWith("call.json") || x.EndsWith("callstatus.json") || x.EndsWith("callresponse.json")));
-            foreach (var stepFile in stepFiles)
+            if (twilioSteps == null)
             {
-                var stepTranscript = JsonConvert.DeserializeObject<TwillioTranscript>(File.ReadAllText(stepFile));
-                if (stepTranscript != null)
-                {
-                    testStepStats.Add(new TestStepStats
-                    {
-                        StepId = stepCount++,
-                        StepName = Path.GetFileNameWithoutExtension(stepFile),
-                        ExpectToHear = GetStepExpectaion(stepTranscript),
-                        Status = stepTranscript.Status,
-                        Confidence = GetStepConfidence(stepTranscript),
-                    });
-                }
+                throw new Exception("Test steps not found");
             }
-            return testStepStats;
+            foreach (var step in twilioSteps)
+            {
+                var stepFile = stepFiles.FirstOrDefault(x => Path.GetFileName(x).ToLower(System.Globalization.CultureInfo.CurrentCulture).Equals(step.StepName.ToLower() + ".json"));
+                if (stepFile != null)
+                {
+                    var stepTranscript = JsonConvert.DeserializeObject<TwillioTranscript>(File.ReadAllText(stepFile));
+                    if (stepTranscript != null)
+                    {
+                        stepViewModels.Add(new StepViewModel
+                        {
+                            StepId = step.Id,
+                            StepName = step.StepName,
+                            ExpectToHear = step.ExpectedResult,
+                            Transcription = GetStepExpectaion(stepTranscript),
+                            ReplyWith = step.ReplyWith,
+                            Status = stepTranscript.Status,
+                            Confidence = GetStepConfidence(stepTranscript),
+                        });
+                    }
+                }
+                var testStats = localTestRunService.GetTestStats(Path.Combine(RunnerConfiguration.FileStoragePath, testName, testId));
+                string runDuration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}";
+                runResultViewModel = new RunResultViewModel
+                {
+                    RunId = testId,
+                    TestName = testName,
+                    TestDescription = twilioTests?.TestDescription,
+                    RunStatus = localTestRunService.GetTestStatus(Path.Combine(RunnerConfiguration.FileStoragePath, testName, testId)),
+                    RunDate = testStats?.DateCreated ?? DateTime.MinValue,
+                    DialResult = "Answered",
+                    RunDuration = runDuration,
+                    Steps = stepViewModels
+                };
+            }
+            return runResultViewModel ?? new RunResultViewModel();
+        }
+
+        private static Tests? GetTestDetails(string testCaseName)
+        {
+            var twilioTestManagementFile = RunnerConfiguration.TestInventoryFileStoragePath != null
+                ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
+                : [];
+            var twilioTests = JsonConvert.DeserializeObject<TwilioTestCases>(File.ReadAllText(twilioTestManagementFile.First()));
+            return twilioTests?.Tests?.FirstOrDefault(x => x.TestName == testCaseName);
         }
 
         private static string GetStepExpectaion(TwillioTranscript stepTranscript)
         {
-            var expectToHear = String.Empty;
+            var expectToHear = string.Empty;
             foreach (var transcript in stepTranscript.Transcription)
             {
                 expectToHear += transcript.Transcript + " ";

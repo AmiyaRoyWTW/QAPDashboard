@@ -5,6 +5,8 @@ namespace QAPDashboard.Areas.RunResults.ViewModels
     public class RunResultViewModel : ViewModelBase
     {
         public string? RunId { get; set; }
+        public string? TestName { get; set; }
+        public string? TestDescription { get; set; }
         public string RunStatus { get; set; } = String.Empty;
         public List<StepViewModel> Steps { get; set; } = [];
         public string? DialResult { get; set; } = "Answered";

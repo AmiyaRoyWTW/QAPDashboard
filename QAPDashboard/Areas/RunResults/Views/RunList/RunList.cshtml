@@ -1,4 +1,5 @@
 ﻿@using QAPDashboard.Views.Shared.Components.Button;
+@using QAPDashboard.Views.Shared.Components.Dropdown
 @model RunListViewModel;
 
 @{
@@ -6,35 +7,57 @@
 }
 
 <div class="container mx-auto">
-  <div id="runs" class="mt-8 text-slate-700 px-4 pt-4 rounded">
-    <h2 class="text-3xl mb-4">Call Results</h2>
 
+  <div class="mt-8 text-slate-700 px-4 pt-4 rounded">
+    <h2 class="text-3xl mb-4">Call Results</h2>
+  </div>
+
+  <div class="w-full lg:min-h-screen flex flex-col lg:flex-row">
+    <!-- Left Sidebar - Donut chart -->
+    <div class="order-2 mt-8 lg:order-1 w-full lg:w-3/5">
+      <div id="RunDetailChart" class="w-full h-full flex flex-row items-center">
+        <div class="py-6" id="donut-chart" style="width: 100%; height: 100%;"></div>
+      </div>
+    </div>
+    <!-- Right Sidebar - Filter -->
     <form action="@Url.Content("~/")" class="p-4">
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div class="md:col-span-2">
+      <div
+        class="w-full lg:min-h-screen border-solid border-0 border-l border-grey-300 order-1 p-4 lg:order-3 lg:block lg:w-2/5">
+        <div class="grid grid-cols-2 gap-4">
+          @await Component.InvokeAsync("Dropdown", new DropdownViewModel() { Id = "testCaseDropdown", Name =
+          "testCaseDropdown", Label = "Test Type", Options = Model.Runs.TestCases, SelectedItem =
+          Model.Runs.SelectedTestCaseFilter })
+          <input type="hidden" id="testCaseFilter" name="testCaseFilter" value="@Model.Runs.SelectedTestCaseFilter" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          @await Component.InvokeAsync("Dropdown", new DropdownViewModel() { Id = "dateRangeDropdown", Name =
+                    "dateRangeDropdown", Label = "Report From", Options = Model.Runs.DateRanges, SelectedItem =
+                    Model.Runs.SelectedDateRange })
+          <input type="hidden" id="dateRangeFilter" name="dateRangeFilter" value="@Model.Runs.SelectedDateRange" />
+        </div>
+        <div id="customRange" class="grid grid-cols-2 gap-4" style="display: none;">
           <div class="grid grid-cols-2 gap-4">
             <div class="flex items-center border border-gray-300">
               <label for="startDate" class="bg-bluegw-800 text-white px-2 py-2 text-center w-20">From</label>
               <input type="date" name="startDate" class="w-full rounded p-2 focus:outline-none bg-white">
             </div>
-
+          </div>
+          <div class="grid grid-cols-2 gap-4">
             <div class="flex items-center border border-gray-300">
               <label for="endDate" class="bg-bluegw-800 text-white px-2 py-2 text-center w-20">To</label>
               <input type="date" name="endDate" class="w-full rounded p-2 focus:outline-none bg-white">
             </div>
           </div>
         </div>
-        <div class="md:col-span-1 w-full flex items-end">
-          @await Component.InvokeAsync("Button", new ButtonViewModel { Type = "submit", Text = "Search by date range",
-          TailwindClasses = "w-full" })
+        <div class="grid grid-cols-2 gap-4">
+          @await Component.InvokeAsync("Button", new ButtonViewModel { Type = "submit", Text = "Refresh Report",
+                    TailwindClasses = "w-full" })
         </div>
       </div>
     </form>
+  </div>
 
-    <div id="RunDetailChart" class="w-full h-full flex flex-row items-center">
-      <div class="py-6" id="donut-chart" style="width: 100%; height: 100%;"></div>
-    </div>
-
+  <div class="mt-8 text-slate-700 px-4 pt-4 rounded">
     <table id="runsTable" class="w-full bg-white  mt-4 table-auto">
       <thead class="bg-bluegw-100 text-slate-700">
         <tr>
@@ -48,25 +71,25 @@
         </tr>
       </thead>
       <tbody>
-        @foreach (var run in Model.Runs)
+        @foreach (var call in Model.Runs.Calls)
         {
           <tr class="bg-white hover:bg-sky-50">
             <td class="p-4 border border-gray-300">
-              <a href="/run-result/@run.TestName/@run.RunName" class="text-blue-500 hover:underline">@run.RunName</a>
+              <a href="/run-result/@call.TestName/@call.CallId" class="text-blue-500 hover:underline">@call.CallId</a>
             </td>
-            <td class="p-4 border border-gray-300">@run.Date.ToString("yyyy/MM/dd HH:mm:ss")</td>
-            <td class="p-4 border border-gray-300">{EarlyMedia}@run.CalledNumber;From:@run.CallingNumber</td>
-            <td class="p-4 border border-gray-300">@run.Duration</td>
-            <td class="p-4 border border-gray-300">@run.DetailedResults</td>
+            <td class="p-4 border border-gray-300">@call.Date.ToString("yyyy/MM/dd HH:mm:ss")</td>
+            <td class="p-4 border border-gray-300">{EarlyMedia}@call.CalledNumber;From:@call.CallingNumber</td>
+            <td class="p-4 border border-gray-300">@call.Duration</td>
+            <td class="p-4 border border-gray-300">@call.DetailedResults</td>
             <td class="p-4 border border-gray-300">
               <div class="border-2 border-solid bg-green-500 opacity-100 font-extrabold text-center">
-                @run.Result
+                @call.Result
               </div>
             </td>
             <td class="p-4 border border-gray-300">
               <button type="button" id="audiodownload"
                 class="text-blue bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                onclick="downloadAudio('@run.RunName', '@run.AudioFileName')">
+                onclick="downloadAudio('@call.CallId', '@call.AudioFileName')">
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                   fill="none" viewBox="0 0 16 18">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -91,19 +114,55 @@
       perPage: 10,
     });
   </script>
+  <script>
+    const elements = {
+      testCaseFilterDropdown: document.querySelector("#testCaseDropdown"),
+      testCaseFilterInput: document.querySelector("#testCaseFilter"),
+      dateRangeFilterDropdown: document.querySelector("#dateRangeDropdown"),
+      dateRangeFilterInput: document.querySelector("#dateRangeFilter"),
+    }
+
+    function onTestCaseFilterChange(event) {
+      elements.testCaseFilterInput.value = event.target.value;
+      //event.target.form.submit();
+    }
+
+    window.onloadeddata = updateDateRangeFilterInput();
+
+    function updateDateRangeFilterInput() {
+      if (elements.dateRangeFilterInput === "Custom Range") {
+        document.getElementById("customRange").style.display = "grid";
+
+      }
+    }
+
+    function onDateRangeFilterChange(event) {
+      if (event.target.value === "Custom Range") {
+        document.getElementById("customRange").style.display = "grid";
+      } else {
+        document.getElementById("customRange").style.display = "none";
+      }
+      elements.dateRangeFilterInput.value = event.target.value;
+      //event.target.form.submit();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      elements.testCaseFilterDropdown.addEventListener("change", onTestCaseFilterChange);
+      elements.dateRangeFilterDropdown.addEventListener("change", onDateRangeFilterChange);
+    });
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
   <script>
     const getChartOptions = () => {
       return {
         series:
           [
-                      @Model.Runs.ToList().Where(x => x.Result == "Success").Count(),
-                      @Model.Runs.ToList().Where(x => x.Result == "Failed").Count(),
-                      @Model.Runs.ToList().Where(x => x.Result == "Errored").Count(),
-                      @Model.Runs.ToList().Where(x => x.Result == "In Progress").Count(),
-                      @Model.Runs.ToList().Where(x => x.Result == "Unknown").Count(),
+                                                @Model.Runs.Calls.ToList().Where(x => x.Result == "Success").Count(),
+                                                @Model.Runs.Calls.ToList().Where(x => x.Result == "Failed").Count(),
+                                                @Model.Runs.Calls.ToList().Where(x => x.Result == "Errored").Count(),
+                                                @Model.Runs.Calls.ToList().Where(x => x.Result == "In Progress").Count(),
+                                                @Model.Runs.Calls.ToList().Where(x => x.Result == "Unknown").Count(),
           ],
         colors: ["#38761d", "#cc0000", "#990000", "#f1c232", "#999999"],
         chart: {
@@ -223,36 +282,7 @@
     }
   </script>
 
-  @*<script src="https://unpkg.com/axios/dist/axios.min.js"></script>*@
   <script>
-    /*function startDownload(audioUrl, audioFileName) {
-      axios({
-        url: audioUrl,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'audio/x-wav',
-          'Authorization': 'Basic ' + btoa(':'),
-        },
-        responseType: 'arraybuffer',
-      }).then((response) => {
-        if(response.status === 200) {
-          const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/x-wav' }));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', audioFileName);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-        }
-        else{
-          console.log('Error');
-        }
-      }).catch((error) => {
-        console.log(error);
-      });
-    }*/
-
     async function downloadAudio(runName, audioFileName) {
       const apiUrl = `/api/audio?runId=${runName}`;
       const response = await fetch(apiUrl);

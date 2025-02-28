@@ -2,14 +2,13 @@
 
 <label for="@Model.Id" class="mb-2 block text-base font-medium text-gray-700">@Model.Label</label>
 <select id="@Model.Id" name="@Model.Name" class="w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-400 focus:outline-none cursor-pointer"
-@(Model.Options.Count() <= 1 ? "disabled" : "")>
-    @if (!string.IsNullOrEmpty(@Model.FirstItem))
+@((Model.Options != null && (Model.Options.Count > 1 || !string.IsNullOrEmpty(Model.FirstItem))) ? "" : "disabled")>
+    @if (!string.IsNullOrEmpty(Model.FirstItem))
     {
-        <option value="">@Model.FirstItem</option>
+        <option value="" selected>@Model.FirstItem</option>
     }
-
     @foreach (var option in Model.Options)
     {
-        <option value="@option">@option</option>
+        <option value="@option" selected="@(!string.IsNullOrEmpty(Model.SelectedItem) && option == Model.SelectedItem)">@option</option>
     }
 </select>

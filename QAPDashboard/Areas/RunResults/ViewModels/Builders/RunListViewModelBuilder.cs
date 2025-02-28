@@ -1,9 +1,9 @@
 ﻿using QAPDashboard.Common.Bases;
 using QAPDashboard.Common.Interfaces;
 using QAPDashboard.Common.DTOs;
-using QAPDashboard.Shared.Models;
 using QAPDashboard.Shared.Services.TestRuns;
 using QAPDashboard.Shared.Models.Twillio;
+using QAPDashboard.Shared.Utilities;
 
 namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
 {
@@ -29,20 +29,23 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
         {
             SetBuilderParameters(builderParameters);
             string url = GetBuilderParameterValue("url");
+            string testCaseFilter = GetBuilderParameterValue("testCaseFilter");
+            string dateRangeFilter = GetBuilderParameterValue("dateRangeFilter");
             string startDate = GetBuilderParameterValue("startDate");
             string endDate = GetBuilderParameterValue("endDate");
-            //IEnumerable<string> testRuns = _localTestRunService.GetLocalTestRuns(url, startDate, endDate);
-            IEnumerable<Runs> testRuns = _localTestRunService.GetLocalTestRuns(startDate, endDate);
+            WorkflowData.SelectedTestCaseFilter = testCaseFilter;
+            WorkflowData.SelectedDateRangeFilter = dateRangeFilter;
+            Runs testRuns = _localTestRunService.GetLocalTestRuns(testCaseFilter, dateRangeFilter, startDate, endDate);
 
             // Materialize the IEnumerable<TestRun> into a list
-            List<Runs> testRunsList = [.. testRuns];
+            //List<Runs> testRunsList = [.. testRuns];
 
             // Modify the StartTime property of each TestRun
-            testRunsList.ForEach(x => x.Date = x.Date.ToLocalTime());
+            testRuns.Calls.ForEach(x => x.Date = x.Date.ToLocalTime());
 
             RunListViewModel runListVM = new()
             {
-                Runs = testRunsList
+                Runs = testRuns
             };
 
             return runListVM;
