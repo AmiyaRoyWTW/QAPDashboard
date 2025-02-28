@@ -7,15 +7,16 @@ namespace QAPDashboard.Shared.Services.TestCases
 
     public interface ILocalTestCaseService
     {
-        List<TestStepStats> GetLocalTestSteps(string testId);
+        List<TestStepStats> GetLocalTestSteps(string testName, string testId);
     }
     public class LocalTestCaseService : ILocalTestCaseService
     {
-        public List<TestStepStats> GetLocalTestSteps(string testId)
+        public List<TestStepStats> GetLocalTestSteps(string testName, string testId)
         {
             int stepCount = 1;
             List<TestStepStats> testStepStats = [];
-            var stepFiles = Directory.GetFiles(Path.Combine(RunnerConfiguration.FileStoragePath, testId)).Where(x => !(x.EndsWith("call.json") || x.EndsWith("callstatus.json") || x.EndsWith("callresponse.json")));
+            var pathName = Path.Combine(RunnerConfiguration.FileStoragePath, testName, testId);
+            var stepFiles = Directory.GetFiles(Path.Combine(RunnerConfiguration.FileStoragePath, testName, testId)).Where(x => !(x.EndsWith("call.json") || x.EndsWith("callstatus.json") || x.EndsWith("callresponse.json")));
             foreach (var stepFile in stepFiles)
             {
                 var stepTranscript = JsonConvert.DeserializeObject<TwillioTranscript>(File.ReadAllText(stepFile));
@@ -37,7 +38,7 @@ namespace QAPDashboard.Shared.Services.TestCases
         private static string GetStepExpectaion(TwillioTranscript stepTranscript)
         {
             var expectToHear = String.Empty;
-            foreach( var transcript in stepTranscript.Transcription)
+            foreach (var transcript in stepTranscript.Transcription)
             {
                 expectToHear += transcript.Transcript + " ";
             }
@@ -46,7 +47,7 @@ namespace QAPDashboard.Shared.Services.TestCases
         private static double GetStepConfidence(TwillioTranscript stepTranscript)
         {
             var confidences = stepTranscript.Transcription.Select(x => x.Confidence).ToList();
-            return Math.Round(Queryable.Average(confidences.AsQueryable())*100, 2);
+            return Math.Round(Queryable.Average(confidences.AsQueryable()) * 100, 2);
         }
     }
 }

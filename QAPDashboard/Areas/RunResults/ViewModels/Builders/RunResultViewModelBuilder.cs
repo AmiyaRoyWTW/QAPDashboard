@@ -26,15 +26,15 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
         public RunResultViewModel Build(List<BuilderParameterDTO> parameters)
         {
             SetBuilderParameters(parameters);
-            return CastToRunResultVM(GetBuilderParameterValue("testRunId"), _localTestCaseService);
+            return CastToRunResultVM(GetBuilderParameterValue("testCaseName"), GetBuilderParameterValue("testRunId"), _localTestCaseService);
         }
 
-        private static RunResultViewModel CastToRunResultVM(string testRunId, ILocalTestCaseService localTestCaseService)
+        private static RunResultViewModel CastToRunResultVM(string testCaseName, string testRunId, ILocalTestCaseService localTestCaseService)
         {
             RunResultViewModel runResultViewModel;
             LocalTestRunService localTestRunService = new();
             List<StepViewModel> stepViewModels = [];
-            var steps = localTestCaseService.GetLocalTestSteps(testRunId);
+            var steps = localTestCaseService.GetLocalTestSteps(testCaseName, testRunId);
             foreach (var step in steps)
             {
                 stepViewModels.Add(new StepViewModel
@@ -48,12 +48,12 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
                     Confidence = step.Confidence,
                 });
             }
-            var testStats = localTestRunService.GetTestStats(Path.Combine(RunnerConfiguration.FileStoragePath, testRunId));
+            var testStats = localTestRunService.GetTestStats(Path.Combine(RunnerConfiguration.FileStoragePath, testCaseName, testRunId));
             string runDuration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}";
             runResultViewModel = new RunResultViewModel
             {
                 RunId = testRunId,
-                RunStatus = localTestRunService.GetTestStatus(Path.Combine(RunnerConfiguration.FileStoragePath, testRunId)),
+                RunStatus = localTestRunService.GetTestStatus(Path.Combine(RunnerConfiguration.FileStoragePath, testCaseName, testRunId)),
                 RunDate = testStats?.DateCreated ?? DateTime.MinValue,
                 DialResult = "Answered",
                 RunDuration = runDuration,

@@ -19,19 +19,24 @@ namespace QAPDashboard.Shared.Services.TestRuns
             var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
             foreach (var resultDirectory in resultDirectories)
             {
-                var testStats = GetTestStats(resultDirectory);
-                var audioFilePath = $"https://api.twilio.com/2010-04-01/Accounts/{RunnerConfiguration.TwilioAccountSid}/Recordings/RE32153b1d70d795ed930331e1ab0788e7.wav";
-                runs.Add(new Runs
+                var runDirectories = Directory.GetDirectories(resultDirectory);
+                foreach (var runDirectory in runDirectories)
                 {
-                    RunName = resultDirectory.Split("\\").ToList().Last(),
-                    Result = GetTestStatus(resultDirectory),
-                    Date = testStats?.DateCreated ?? DateTime.MinValue,
-                    Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
-                    CallingNumber = testStats?.CallingNumber ?? "",
-                    CalledNumber = testStats?.CalledNumber ?? "",
-                    AudioFile = audioFilePath,
-                    AudioFileName = Path.GetFileName(audioFilePath),
-                });
+                    var testStats = GetTestStats(runDirectory);
+                    var audioFilePath = $"https://api.twilio.com/2010-04-01/Accounts/{RunnerConfiguration.TwilioAccountSid}/Recordings/RE32153b1d70d795ed930331e1ab0788e7.wav";
+                    runs.Add(new Runs
+                    {
+                        RunName = runDirectory.Split("\\").ToList().Last(),
+                        TestName = resultDirectory.Split("\\").ToList().Last(),
+                        Result = GetTestStatus(runDirectory),
+                        Date = testStats?.DateCreated ?? DateTime.MinValue,
+                        Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
+                        CallingNumber = testStats?.CallingNumber ?? "",
+                        CalledNumber = testStats?.CalledNumber ?? "",
+                        AudioFile = audioFilePath,
+                        AudioFileName = Path.GetFileName(audioFilePath),
+                    });
+                }
             }
             return runs;
         }
@@ -49,23 +54,28 @@ namespace QAPDashboard.Shared.Services.TestRuns
             var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
             foreach (var resultDirectory in resultDirectories)
             {
-                var testStats = GetTestStats(resultDirectory);
-                var audioFilePath = $"https://api.twilio.com/2010-04-01/Accounts/{RunnerConfiguration.TwilioAccountSid}/Recordings/RE32153b1d70d795ed930331e1ab0788e7.wav";
-                if (testStats?.DateCreated > parsedStartDate && testStats.DateCreated < parsedEndDate)
+                var runDirectories = Directory.GetDirectories(resultDirectory);
+                foreach (var runDirectory in runDirectories)
                 {
-                    lock (runs)
+                    var testStats = GetTestStats(runDirectory);
+                    var audioFilePath = $"https://api.twilio.com/2010-04-01/Accounts/{RunnerConfiguration.TwilioAccountSid}/Recordings/RE32153b1d70d795ed930331e1ab0788e7.wav";
+                    if (testStats?.DateCreated > parsedStartDate && testStats.DateCreated < parsedEndDate)
                     {
-                        runs.Add(new Runs
+                        lock (runs)
                         {
-                            RunName = resultDirectory.Split("\\").ToList().Last(),
-                            Result = GetTestStatus(resultDirectory),
-                            Date = testStats?.DateCreated ?? DateTime.MinValue,
-                            Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
-                            CallingNumber = testStats?.CallingNumber ?? "",
-                            CalledNumber = testStats?.CalledNumber ?? "",
-                            AudioFile = audioFilePath,
-                            AudioFileName = Path.GetFileName(audioFilePath),
-                        });
+                            runs.Add(new Runs
+                            {
+                                RunName = runDirectory.Split("\\").ToList().Last(),
+                                TestName = resultDirectory.Split("\\").ToList().Last(),
+                                Result = GetTestStatus(runDirectory),
+                                Date = testStats?.DateCreated ?? DateTime.MinValue,
+                                Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
+                                CallingNumber = testStats?.CallingNumber ?? "",
+                                CalledNumber = testStats?.CalledNumber ?? "",
+                                AudioFile = audioFilePath,
+                                AudioFileName = Path.GetFileName(audioFilePath),
+                            });
+                        }
                     }
                 }
             }

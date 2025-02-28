@@ -3,6 +3,7 @@
     public class Runs
     {
         public required string RunName { get; set; }
+        public required string TestName { get; set; }
         public string CallingNumber { get; set; } = String.Empty;
         public string CalledNumber { get; set; } = String.Empty;
         public DateTime Date { get; set; } = DateTime.Now;

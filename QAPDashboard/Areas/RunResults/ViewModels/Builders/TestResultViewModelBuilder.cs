@@ -99,7 +99,7 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
                 testResultViewModel.Trace = matches;
             }
 
-            testResultViewModel.AppType = RunnerConfiguration.ApplicationType;
+            testResultViewModel.AppType = RunnerConfiguration.ApplicationType ?? "defaultAppType";
 
             return testResultViewModel;
         }

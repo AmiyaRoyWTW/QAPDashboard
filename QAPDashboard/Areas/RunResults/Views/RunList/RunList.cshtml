@@ -52,7 +52,7 @@
         {
           <tr class="bg-white hover:bg-sky-50">
             <td class="p-4 border border-gray-300">
-              <a href="/run-result/@run.RunName" class="text-blue-500 hover:underline">@run.RunName</a>
+              <a href="/run-result/@run.TestName/@run.RunName" class="text-blue-500 hover:underline">@run.RunName</a>
             </td>
             <td class="p-4 border border-gray-300">@run.Date.ToString("yyyy/MM/dd HH:mm:ss")</td>
             <td class="p-4 border border-gray-300">{EarlyMedia}@run.CalledNumber;From:@run.CallingNumber</td>
@@ -64,9 +64,13 @@
               </div>
             </td>
             <td class="p-4 border border-gray-300">
-              <button type="button" id="audiodownload" class="text-blue bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onclick="downloadAudio('@run.RunName', '@run.AudioFileName')">
-                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
+              <button type="button" id="audiodownload"
+                class="text-blue bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                onclick="downloadAudio('@run.RunName', '@run.AudioFileName')">
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 16 18">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
                 </svg>
               </button>
             </td>
@@ -95,11 +99,11 @@
       return {
         series:
           [
-            @Model.Runs.ToList().Where(x => x.Result == "Success").Count(),
-            @Model.Runs.ToList().Where(x => x.Result == "Failed").Count(),
-            @Model.Runs.ToList().Where(x => x.Result == "Errored").Count(),
-            @Model.Runs.ToList().Where(x => x.Result == "In Progress").Count(),
-            @Model.Runs.ToList().Where(x => x.Result == "Unknown").Count(),
+                      @Model.Runs.ToList().Where(x => x.Result == "Success").Count(),
+                      @Model.Runs.ToList().Where(x => x.Result == "Failed").Count(),
+                      @Model.Runs.ToList().Where(x => x.Result == "Errored").Count(),
+                      @Model.Runs.ToList().Where(x => x.Result == "In Progress").Count(),
+                      @Model.Runs.ToList().Where(x => x.Result == "Unknown").Count(),
           ],
         colors: ["#38761d", "#cc0000", "#990000", "#f1c232", "#999999"],
         chart: {
@@ -249,7 +253,7 @@
       });
     }*/
 
-    async function downloadAudio(runName, audioFileName){
+    async function downloadAudio(runName, audioFileName) {
       const apiUrl = `/api/audio?runId=${runName}`;
       const response = await fetch(apiUrl);
 

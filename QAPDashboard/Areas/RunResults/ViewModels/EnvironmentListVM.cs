@@ -5,6 +5,6 @@ namespace QAPDashboard.Areas.RunResults.ViewModels
 {
     public class EnvironmentListVM : ViewModelBase
     {
-        public List<AzureTableEntry> Environments { get; set; }
+        public List<AzureTableEntry>? Environments { get; set; }
     }
 }

@@ -25,11 +25,12 @@ namespace QAPDashboard.Areas.RunResults.Controllers
             _logger = logger;
         }
 
-        [HttpGet, Route("{testRunId}")]
-        public IActionResult? RunResult(string testRunId)
+        [HttpGet, Route("{testCaseName}/{testRunId}")]
+        public IActionResult? RunResult(string testCaseName, string testRunId)
         {
             try
             {
+                AddVMBuilderParameter("testCaseName", testCaseName);
                 AddVMBuilderParameter("testRunId", testRunId);
                 _logger.LogInformation("Coming inside RunResult");
                 return View(_runResultViewModeBuilder.Build(builderParameters));
@@ -65,7 +66,11 @@ namespace QAPDashboard.Areas.RunResults.Controllers
             }
             //RESTDashboardTestRunExecutionStorageService testOrchestrationService = new();
             //testOrchestrationService.SendFileSystemResultsToServer(testRunId, RunnerConfiguration.FileStoragePath);
-            string redirectUrl = Url.Action("RunResult", new { testRunId });
+            string? redirectUrl = Url.Action("RunResult", new { testRunId });
+            if (redirectUrl == null)
+            {
+                return RedirectToAction("Error", "Home");
+            }
             return Redirect(redirectUrl);
         }
 

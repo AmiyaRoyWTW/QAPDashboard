@@ -5,6 +5,6 @@ namespace QAPDashboard.Areas.RunResults.ViewModels
 {
     public class OverviewTableReportVM : ViewModelBase
     {
-        public List<OverviewTableReportDTO> RunReports { get; set; }
+        public List<OverviewTableReportDTO>? RunReports { get; set; }
     }
 }
