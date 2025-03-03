@@ -6,7 +6,6 @@ module.exports = {
         './Views/**/**/**/*.cshtml',
     ],
     theme: {
-        
         extend: {
             spacing: {
                 '18': '4.5rem',
@@ -24,7 +23,6 @@ module.exports = {
                     800: '#0D4689',
                     900: '#06356D',
                 },
-
             },
 },
     },

@@ -47,7 +47,7 @@ namespace QAPDashboard.Shared.Extensions
         }
         public static string GetGeneralizedErrorMessage(this TestCase testCase)
         {
-            string errorMessage = testCase?.TestCaseError?.Message;
+            string? errorMessage = testCase?.TestCaseError?.Message;
 
             if (testCase?.TestCaseError == null)
             {

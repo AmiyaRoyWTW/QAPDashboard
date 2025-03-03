@@ -66,10 +66,9 @@ namespace QAPDashboard.Shared.Utilities
 
         public static List<string> GetTestAssemblyPaths(string solutionPath)
         {
-            return Directory.GetFiles(solutionPath, "*.dll", SearchOption.AllDirectories)
+            return [.. Directory.GetFiles(solutionPath, "*.dll", SearchOption.AllDirectories)
                             .Where(path => path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") &&
-                                           Path.GetFileNameWithoutExtension(path).ToLower().Contains("tests"))
-                            .ToList();
+                            Path.GetFileNameWithoutExtension(path).Contains("tests", StringComparison.CurrentCultureIgnoreCase))];
         }
 
         public static bool IsValidPath(string path)
