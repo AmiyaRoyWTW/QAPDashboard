@@ -1,5 +1,6 @@
 ﻿@using QAPDashboard.Views.Shared.Components.Button;
 @using QAPDashboard.Views.Shared.Components.FilterDropdown
+@using QAPDashboard.Views.Shared.Components.Spinner
 @model RunListViewModel;
 
 @{
@@ -36,15 +37,15 @@
         </div>
         <div id="customRange" class="grid grid-cols-2 gap-4" style="display: none;">
           <div class="grid grid-cols-1 gap-4">
-            <div class="flex items-center border border-gray-300">
-              <label for="startDate" class="bg-blue-500 text-white px-2 py-2 text-center w-20">From</label>
-              <input type="date" name="startDate" class="w-full rounded p-2 focus:outline-none bg-white">
+            <div class="flex items-center">
+              <label for="startDate" class="bg-blue-500 text-white px-2 py-2 text-center w-20 mr-1 rounded-lg">From</label>
+              <input type="date" id="=startDate" name="startDate" class="w-full rounded-lg p-2 focus:outline-none bg-white" value="@Model.Runs.CustomStartDate">
             </div>
           </div>
           <div class="grid grid-cols-1 gap-4">
-            <div class="flex items-center border border-gray-300">
-              <label for="endDate" class="bg-blue-500 text-white px-2 py-2 text-center w-20">To</label>
-              <input type="date" name="endDate" class="w-full rounded p-2 focus:outline-none bg-white">
+            <div class="flex items-center">
+              <label for="endDate" class="bg-blue-500 text-white px-2 py-2 text-center w-20 mr-1 rounded-lg">To</label>
+              <input type="date" id="endDate" name="endDate" class="w-full rounded-lg p-2 focus:outline-none bg-white" value="@Model.Runs.CustomEndDate">
             </div>
           </div>
         </div>
@@ -82,28 +83,15 @@
             <td class="p-4 border border-gray-300">@call.DetailedResults</td>
             <td class="p-4 border border-gray-300">
               @{
-                var bgcolor = "";
-                switch(@call.Result)
+                var bgcolor = call.Result switch
                 {
-                  case "Success":
-                    bgcolor = "bg-green-500";
-                    break;
-                  case "Failed":
-                    bgcolor = "bg-red-600";
-                    break;
-                  case "Errored":
-                    bgcolor = "bg-red-600";
-                    break;
-                  case "In Progress":
-                    bgcolor = "bg-yellow-200";
-                    break;
-                  case "Unknown":
-                    bgcolor = "bg-gray-200";
-                    break;
-                  default:
-                    bgcolor = "bg-gray-200";
-                    break;
-                }
+                  "Success" => "bg-green-500",
+                  "Failed" => "bg-red-400",
+                  "Errored" => "bg-red-600",
+                  "In Progress" => "bg-yellow-200",
+                  "Unknown" => "bg-gray-200",
+                  _ => "bg-gray-200",
+                };
               }
               <div class="border-2 border-solid @bgcolor opacity-100 font-bold text-center rounded-lg">
                 @call.Result
@@ -111,7 +99,7 @@
             </td>
             <td class="p-4 border border-gray-300 flex flex-col justify-center items-center">
               <button type="button" id="audiodownload"
-                class="text-blue bg-blue-300 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-300 dark:hover:bg-blue-500 dark:focus:ring-blue-800"
+                class="text-blue bg-blue-300 hover:bg-blue-500 focus:ring-4 focus:outline-none cursor-pointer focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-300 dark:hover:bg-blue-500 dark:focus:ring-blue-800"
                 onclick="downloadAudio('@call.CallId', '@call.AudioFileName')">
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                   fill="none" viewBox="0 0 16 18">
@@ -119,6 +107,7 @@
                     d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
                 </svg>
               </button>
+              @await Component.InvokeAsync("Spinner", new SpinnerViewModel { Id = "download-spinner", Class = "w-6 h-6", Style = "display: none;" })
             </td>
           </tr>
         }
@@ -143,6 +132,9 @@
       testCaseFilterInput: document.querySelector("#testCaseFilter"),
       dateRangeFilterDropdown: document.querySelector("#dateRangeDropdown"),
       dateRangeFilterInput: document.querySelector("#dateRangeFilter"),
+      dateInputContainer: document.getElementById("customRange"),
+      startDateInput: document.getElementById("startDate"),
+      endDateInput: document.getElementById("endDate"),
     }
 
     function onTestCaseFilterChange(event) {
@@ -153,17 +145,16 @@
     window.onloadeddata = updateDateRangeFilterInput();
 
     function updateDateRangeFilterInput() {
-      if (elements.dateRangeFilterInput === "Custom Range") {
-        document.getElementById("customRange").style.display = "grid";
-
+      if (elements.dateRangeFilterInput.value === "Custom Range") {
+        elements.dateInputContainer.style.display = "grid";
       }
     }
 
     function onDateRangeFilterChange(event) {
       if (event.target.value === "Custom Range") {
-        document.getElementById("customRange").style.display = "grid";
+        elements.dateInputContainer.style.display = "grid";
       } else {
-        document.getElementById("customRange").style.display = "none";
+        elements.dateInputContainer.style.display = "none";
       }
       elements.dateRangeFilterInput.value = event.target.value;
       //event.target.form.submit();
@@ -273,7 +264,7 @@
       chart.render();
 
       // Get all the checkboxes by their class name
-      const checkboxes = document.querySelectorAll('#devices input[type="checkbox"]');
+      /*const checkboxes = document.querySelectorAll('#devices input[type="checkbox"]');
 
       // Function to handle the checkbox change event
       function handleCheckboxChange(event, chart) {
@@ -301,12 +292,16 @@
       // Attach the event listener to each checkbox
       checkboxes.forEach((checkbox) => {
         checkbox.addEventListener('change', (event) => handleCheckboxChange(event, chart));
-      });
+      });*/
     }
   </script>
 
   <script>
     async function downloadAudio(runName, audioFileName) {
+      const audioDownloadButton = document.getElementById('audiodownload');
+      const audioSpinner = document.getElementById('download-spinner');
+      audioDownloadButton.style.display = "none";
+      audioSpinner.style.display = "block";
       const apiUrl = `/api/audio?runId=${runName}`;
       const response = await fetch(apiUrl);
 
@@ -323,6 +318,8 @@
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      audioSpinner.style.display = "none";
+      audioDownloadButton.style.display = "block";
     }
   </script>
 }

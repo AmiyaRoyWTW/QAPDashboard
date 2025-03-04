@@ -29,7 +29,7 @@ namespace QAPDashboard.Areas.RunResults.Controllers
                     AddVMBuilderParameter("dateRangeFilter", dateRangeFilter);
                     if (startDate.HasValue && endDate.HasValue)
                     {
-                        AddVMBuilderParameter("startDate", startDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmssfffffff"));
+                        AddVMBuilderParameter("startDate", startDate.Value.ToUniversalTime().AddDays(1).ToString("yyyyMMddHHmmssfffffff"));
                         AddVMBuilderParameter("endDate", endDate.Value.ToUniversalTime().AddDays(1).AddTicks(-1).ToString("yyyyMMddHHmmssfffffff"));
                     }
                     RunListViewModel runListViewModel = _runListViewModeBuilder.Build(builderParameters);

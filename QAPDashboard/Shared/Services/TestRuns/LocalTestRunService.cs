@@ -44,8 +44,6 @@ namespace QAPDashboard.Shared.Services.TestRuns
             runs.Calls = [.. calls.OrderByDescending(call => call.Date)];
             runs.TestCases = ["All", .. resultDirectories.Select(Path.GetFileName)];
             WorkflowData.TestCaseFilters = runs.TestCases;
-            WorkflowData.SelectedTestCaseFilter = runs.SelectedTestCaseFilter;
-            WorkflowData.SelectedDateRangeFilter = runs.SelectedDateRange;
             return runs;
         }
 
@@ -59,7 +57,7 @@ namespace QAPDashboard.Shared.Services.TestRuns
                     selectedStartDate = DateTime.UtcNow.Date;
                     selectedEndDate = DateTime.UtcNow.Date.AddDays(-1).AddTicks(+1);
                     break;
-                case "Last 15 Minuts":
+                case "Last 15 Minutes":
                     selectedStartDate = DateTime.UtcNow.AddMinutes(-15);
                     selectedEndDate = DateTime.UtcNow;
                     break;
@@ -143,8 +141,10 @@ namespace QAPDashboard.Shared.Services.TestRuns
             }
             runs.Calls = [.. calls.OrderByDescending(call => call.Date)];
             runs.TestCases = WorkflowData.TestCaseFilters;
-            runs.SelectedTestCaseFilter = WorkflowData.SelectedTestCaseFilter;
-            runs.SelectedDateRange = WorkflowData.SelectedDateRangeFilter;
+            runs.SelectedTestCaseFilter = testCase;
+            runs.SelectedDateRange = dateRange;
+            runs.CustomStartDate = string.IsNullOrEmpty(startDate) ? null : DateTime.ParseExact(startDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime().ToString("yyyy-MM-dd");
+            runs.CustomEndDate = string.IsNullOrEmpty(endDate) ? null : DateTime.ParseExact(endDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime().ToString("yyyy-MM-dd");
             return runs;
         }
 

@@ -3,8 +3,10 @@
     public class Runs{
         public List<string> TestCases { get; set; } = [];
         public string SelectedTestCaseFilter { get; set; } = "All";
-        public List<string> DateRanges { get; set; } = ["Last 15 Minuts", "Last Hour", "Last 12 Hours", "Last 24 Hours", "This Week", "This Month", "Last Calendar Month", "Custom Range"];
+        public List<string> DateRanges { get; set; } = ["Last 15 Minutes", "Last Hour", "Last 12 Hours", "Last 24 Hours", "This Week", "This Month", "Last Calendar Month", "Custom Range"];
         public string SelectedDateRange { get; set; } = "This Month";
+        public string? CustomStartDate { get; set; }
+        public string? CustomEndDate { get; set; }
         public List<Calls> Calls { get; set; } = [];
     }
     public class Calls

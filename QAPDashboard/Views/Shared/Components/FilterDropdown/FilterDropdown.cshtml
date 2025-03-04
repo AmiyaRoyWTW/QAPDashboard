@@ -1,6 +1,6 @@
 @model QAPDashboard.Views.Shared.Components.FilterDropdown.FilterDropdownViewModel
 
-<label for="@Model.Id" class="mb-2 mr-2 block text-base font-bold text-gray-700 flex flex-col justify-right items-end">@Model.Label</label>
+<label for="@Model.Id" class="mb-2 mr-2 text-base font-bold text-gray-700 flex flex-col justify-right items-end">@Model.Label</label>
 <select id="@Model.Id" name="@Model.Name"
     class="w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-400 focus:outline-none cursor-pointer"
     @((Model.Options != null && (Model.Options.Count > 1 || !string.IsNullOrEmpty(Model.FirstItem))) ? "" : "disabled")>

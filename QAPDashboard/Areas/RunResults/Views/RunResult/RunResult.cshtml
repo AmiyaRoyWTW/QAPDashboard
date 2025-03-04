@@ -8,7 +8,8 @@
 
 @section AddedStyles
 {
-<script src="~/js/site.js" type="text/javascript"></script>
+    <script src="~/js/site.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="~/css/output.css" asp-append-version="true" />
 }
 
 <div class="container mx-auto">
@@ -103,10 +104,11 @@
                 Your browser does not support the audio element.
             </audio>
             <!-- Spinner -->
-            @await Component.InvokeAsync("Spinner", new SpinnerViewModel { Id = "audio-spinner", Class = "w-16 h-16" })
+            @await Component.InvokeAsync("Spinner", new SpinnerViewModel { Id = "audio-spinner", Class = "w-16 h-16",
+            Style = "display: block;" })
 
             <button id="load-audio-btn" onclick="playAudio('@Model.RunId')"
-            class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" hidden>
+                class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" hidden>
                 Play Audio
             </button>
         </div>
@@ -117,7 +119,7 @@
         <table id="runsTable" class="w-full bg-white mt-4 table-auto">
             <thead class="bg-blue-100 text-slate-700">
                 <tr>
-                    <th class="p-4 border border-gray-100">Step</th>
+                    <th class="p-4 border border-gray-100 border-l-4">Step</th>
                     <th class="p-4 border border-gray-100">Description</th>
                     <th class="p-4 border border-gray-100">Expect to Hear</th>
                     <th class="p-4 border border-gray-100">Transcription</th>
@@ -129,13 +131,35 @@
                 @foreach (var step in Model.Steps)
                 {
                     <tr class="bg-white hover:bg-sky-50">
-                        <td class="p-4 border border-gray-100">@step.StepId</td>
+                        @{
+                            var borderleftcolor = step.Status.ToLower() switch
+                            {
+                                "passed" => "border-l-green-500",
+                                "failed" => "border-l-red-400",
+                                "callinprogress" => "border-l-yellow-200",
+                                "notrun" => "border-l-grey-200",
+                                "errored" => "border-l-red-600",
+                                _ => "border-l-yellow-100"
+                            };
+                        }
+                        <td class="p-4 border border-gray-100 border-l-4 @borderleftcolor">@step.StepId</td>
                         <td class="p-4 border border-gray-100">@step.StepName</td>
                         <td class="p-4 border border-gray-100">@step.ExpectToHear</td>
                         <td class="p-4 border border-gray-100">@step.Transcription</td>
                         <td class="p-4 border border-gray-100">@step.ReplyWith</td>
                         <td class="p-4 border border-gray-100">
-                            <span class="border-2 border-solid font-extrabold text-xl text-center bg-green-100 rounded-lg">
+                            @{
+                                var color = step.Status.ToLower() switch
+                                {
+                                    "passed" => "bg-green-500",
+                                    "failed" => "bg-red-400",
+                                    "callinprogress" => "bg-yellow-200",
+                                    "notrun" => "bg-grey-200",
+                                    "errored" => "bg-red-600",
+                                    _ => "bg-yellow-100"
+                                };
+                            }
+                            <span class="border-2 border-solid font-extrabold text-xl text-center @color rounded-lg">
                                 @step.Status</span>
                             <li class="font-light mt-2">Mathed with confidence: @step.Confidence%</li>
                             <li class="font-light">Duration: @step.StepDuration</li>
@@ -151,12 +175,12 @@
 
 @section Scripts
 {
-<script>
-    window.onload = async function loadAudio(runId) {
-    try {
-    const audioPlayer = document.getElementById('audio-player');
-    audioPlayer.style.display = "none";
-    // Fetch audio file from the backend
+    <script>
+        window.onload = async function loadAudio(runId) {
+            try {
+                const audioPlayer = document.getElementById('audio-player');
+                audioPlayer.style.display = "none";
+                // Fetch audio file from the backend
                 const url = `/api/audio?runId=${runId}`;
                 const response = await fetch(url);
 

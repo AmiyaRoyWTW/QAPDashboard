@@ -33,8 +33,8 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
             string dateRangeFilter = GetBuilderParameterValue("dateRangeFilter");
             string startDate = GetBuilderParameterValue("startDate");
             string endDate = GetBuilderParameterValue("endDate");
-            WorkflowData.SelectedTestCaseFilter = testCaseFilter;
-            WorkflowData.SelectedDateRangeFilter = dateRangeFilter;
+            //WorkflowData.SelectedTestCaseFilter = testCaseFilter;
+            //WorkflowData.SelectedDateRangeFilter = dateRangeFilter;
             Runs testRuns = _localTestRunService.GetLocalTestRuns(testCaseFilter, dateRangeFilter, startDate, endDate);
 
             // Materialize the IEnumerable<TestRun> into a list
