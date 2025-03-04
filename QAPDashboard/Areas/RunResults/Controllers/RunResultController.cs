@@ -32,7 +32,6 @@ namespace QAPDashboard.Areas.RunResults.Controllers
             {
                 AddVMBuilderParameter("testCaseName", testCaseName);
                 AddVMBuilderParameter("testRunId", testRunId);
-                _logger.LogInformation("Coming inside RunResult");
                 return View(_runResultViewModeBuilder.Build(builderParameters));
             }
             catch (Exception ex)

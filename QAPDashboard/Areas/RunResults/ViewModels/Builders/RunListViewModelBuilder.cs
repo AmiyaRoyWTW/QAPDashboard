@@ -3,7 +3,6 @@ using QAPDashboard.Common.Interfaces;
 using QAPDashboard.Common.DTOs;
 using QAPDashboard.Shared.Services.TestRuns;
 using QAPDashboard.Shared.Models.Twillio;
-using QAPDashboard.Shared.Utilities;
 
 namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
 {
@@ -18,24 +17,23 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
 
         public RunListViewModel Build()
         {
-            RunListViewModel runListVM = new()
-            {
-                Runs = _localTestRunService.GetLocalTestRuns(),
-            };
-            return runListVM;
+            throw new NotImplementedException();
         }
 
         public RunListViewModel Build(List<BuilderParameterDTO> builderParameters)
         {
+            Runs testRuns;
             SetBuilderParameters(builderParameters);
-            string url = GetBuilderParameterValue("url");
+            string testCaseName = GetBuilderParameterValue("testCaseName");
             string testCaseFilter = GetBuilderParameterValue("testCaseFilter");
             string dateRangeFilter = GetBuilderParameterValue("dateRangeFilter");
             string startDate = GetBuilderParameterValue("startDate");
             string endDate = GetBuilderParameterValue("endDate");
-            //WorkflowData.SelectedTestCaseFilter = testCaseFilter;
-            //WorkflowData.SelectedDateRangeFilter = dateRangeFilter;
-            Runs testRuns = _localTestRunService.GetLocalTestRuns(testCaseFilter, dateRangeFilter, startDate, endDate);
+            if (testCaseFilter != null && dateRangeFilter != null && startDate != null && endDate != null)
+            {
+                testRuns = _localTestRunService.GetLocalTestRuns(testCaseName, dateRangeFilter, startDate, endDate);
+            }
+            else testRuns = _localTestRunService.GetLocalTestRuns(testCaseName);
 
             // Materialize the IEnumerable<TestRun> into a list
             //List<Runs> testRunsList = [.. testRuns];
@@ -45,6 +43,7 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
 
             RunListViewModel runListVM = new()
             {
+                TestCaseName = testCaseName,
                 Runs = testRuns
             };
 

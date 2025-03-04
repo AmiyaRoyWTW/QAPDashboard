@@ -15,6 +15,7 @@ using Microsoft.Extensions.Azure;
 using Azure.Storage.Queues;
 using Azure.Storage.Blobs;
 using Azure.Core.Extensions;
+using QAPDashboard.Shared.Services.ExecutionTestList;
 
 namespace QAPDashboard
 {
@@ -36,10 +37,12 @@ namespace QAPDashboard
             _ = services.AddSingleton<ITestRunSummaryService, AzureTestRunSummaryService>();
             _ = services.AddSingleton<ILocalTestRunService, LocalTestRunService>();
             _ = services.AddSingleton<ILocalRunResultService, LocalStorageRunResultsService>();
+            _ = services.AddSingleton<IExecutionTestService, LocalExecutionTestService>();
 
             _ = services.AddSingleton<IViewModeBuilder<RunListViewModel>, RunListViewModelBuilder>();
             _ = services.AddSingleton<IViewModeBuilder<RunResultViewModel>, RunResultViewModelBuilder>();
             _ = services.AddSingleton<IViewModeBuilder<TestResultViewModel>, TestResultViewModelBuilder>();
+            _ = services.AddSingleton<IViewModeBuilder<ExecutedTestViewModel>, ExecutedTestViewModelBuilder>();
         }
 
         public void Configure(IApplicationBuilder app, IHostEnvironment env)

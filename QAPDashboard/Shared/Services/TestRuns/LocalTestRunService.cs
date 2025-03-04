@@ -9,16 +9,16 @@ namespace QAPDashboard.Shared.Services.TestRuns
 
     public interface ILocalTestRunService
     {
-        Runs GetLocalTestRuns();
+        Runs GetLocalTestRuns(string testCaseName);
         Runs GetLocalTestRuns(string testCase = "", string dateRange = "", string startDate = "", string endDate = "");
     }
     public class LocalTestRunService : ILocalTestRunService
     {
-        public Runs GetLocalTestRuns()
+        public Runs GetLocalTestRuns(string testCaseName)
         {
             Runs runs = new();
             List<Calls> calls = [];
-            var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
+            var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath).Where(x => Path.GetFileName(x) == testCaseName);
             foreach (var resultDirectory in resultDirectories)
             {
                 var runDirectories = Directory.GetDirectories(resultDirectory);
@@ -29,7 +29,6 @@ namespace QAPDashboard.Shared.Services.TestRuns
                     calls.Add(new Calls
                     {
                         CallId = Path.GetFileName(runDirectory),
-                        TestName = Path.GetFileName(resultDirectory),
                         Result = GetTestStatus(runDirectory),
                         Date = testStats?.DateCreated ?? DateTime.MinValue,
                         Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
@@ -47,7 +46,7 @@ namespace QAPDashboard.Shared.Services.TestRuns
             return runs;
         }
 
-        public Runs GetLocalTestRuns(string testCase = "", string dateRange = "", string startDate = "", string endDate = "")
+        public Runs GetLocalTestRuns(string testCaseName, string dateRange = "", string startDate = "", string endDate = "")
         {
             DateTime? selectedStartDate = null;
             DateTime? selectedEndDate = null;
@@ -103,14 +102,7 @@ namespace QAPDashboard.Shared.Services.TestRuns
             Runs runs = new();
             List<Calls> calls = [];
             string[] resultDirectories = [];
-            if (testCase == "All")
-            {
-                resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
-            }
-            else
-            {
-                resultDirectories = [.. Directory.GetDirectories(RunnerConfiguration.FileStoragePath).Where(x => Path.GetFileName(x) == testCase)];
-            }
+            resultDirectories = [.. Directory.GetDirectories(RunnerConfiguration.FileStoragePath).Where(x => Path.GetFileName(x) == testCaseName)];
 
             foreach (var resultDirectory in resultDirectories)
             {
@@ -126,7 +118,6 @@ namespace QAPDashboard.Shared.Services.TestRuns
                             calls.Add(new Calls
                             {
                                 CallId = Path.GetFileName(runDirectory),
-                                TestName = Path.GetFileName(resultDirectory),
                                 Result = GetTestStatus(runDirectory),
                                 Date = testStats?.DateCreated ?? DateTime.MinValue,
                                 Duration = $"{(testStats?.Duration ?? 0) / 3600}:{(testStats?.Duration ?? 0) % 3600 / 60}:{(testStats?.Duration ?? 0) % 3600 % 60}",
@@ -141,7 +132,6 @@ namespace QAPDashboard.Shared.Services.TestRuns
             }
             runs.Calls = [.. calls.OrderByDescending(call => call.Date)];
             runs.TestCases = WorkflowData.TestCaseFilters;
-            runs.SelectedTestCaseFilter = testCase;
             runs.SelectedDateRange = dateRange;
             runs.CustomStartDate = string.IsNullOrEmpty(startDate) ? null : DateTime.ParseExact(startDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime().ToString("yyyy-MM-dd");
             runs.CustomEndDate = string.IsNullOrEmpty(endDate) ? null : DateTime.ParseExact(endDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime().ToString("yyyy-MM-dd");

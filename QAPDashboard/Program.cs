@@ -8,6 +8,7 @@ using QAPDashboard.Shared.Services.TestCases;
 using QAPDashboard.Shared.Services.TestRunResults;
 using QAPDashboard.Shared.Services.TestRuns;
 using QAPDashboard.Shared.Services.TestRunSummaries;
+using QAPDashboard.Shared.Services.ExecutionTestList;
 
 
 var builderApp = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
@@ -31,10 +32,12 @@ builder.Services.AddSingleton<ITestCaseErrorService, AzureTestCaseErrorService>(
 builder.Services.AddSingleton<ITestRunSummaryService, AzureTestRunSummaryService>();
 builder.Services.AddSingleton<ILocalTestRunService, LocalTestRunService>();
 builder.Services.AddSingleton<ILocalRunResultService, LocalStorageRunResultsService>();
+builder.Services.AddSingleton<IExecutionTestService, LocalExecutionTestService>();
 
 builder.Services.AddSingleton<IViewModeBuilder<RunListViewModel>, RunListViewModelBuilder>();
 builder.Services.AddSingleton<IViewModeBuilder<RunResultViewModel>, RunResultViewModelBuilder>();
 builder.Services.AddSingleton<IViewModeBuilder<TestResultViewModel>, TestResultViewModelBuilder>();
+builder.Services.AddSingleton<IViewModeBuilder<ExecutedTestViewModel>, ExecutedTestViewModelBuilder>();
 
 var app = builder.Build();
 

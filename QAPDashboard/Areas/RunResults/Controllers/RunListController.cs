@@ -6,8 +6,7 @@ using QAPDashboard.Areas.RunResults.ViewModels;
 namespace QAPDashboard.Areas.RunResults.Controllers
 {
     [Area("RunResults")]
-    //[Route("run-list")]
-    [Route("")]
+    [Route("run-list")]
     public class RunListController : TestRunnerControllerBase
     {
         private readonly ILogger<RunListController> _logger;
@@ -18,11 +17,12 @@ namespace QAPDashboard.Areas.RunResults.Controllers
             _runListViewModeBuilder = runListViewModeBuilder;
             _logger = logger;
         }
-        [HttpGet, Route("")]
-        public IActionResult? RunList(string url, DateTime? startDate = null, DateTime? endDate = null, string testCaseFilter = "All", string dateRangeFilter = "This Month")
+        [HttpGet, Route("{testCaseName}")]
+        public IActionResult? RunList(string testCaseName, DateTime? startDate = null, DateTime? endDate = null, string testCaseFilter = "All", string dateRangeFilter = "This Month")
         {
             try
             {
+                AddVMBuilderParameter("testCaseName", testCaseName);
                 if (testCaseFilter != "All" || dateRangeFilter != "This Month")
                 {
                     AddVMBuilderParameter("testCaseFilter", testCaseFilter);
@@ -32,17 +32,10 @@ namespace QAPDashboard.Areas.RunResults.Controllers
                         AddVMBuilderParameter("startDate", startDate.Value.ToUniversalTime().AddDays(1).ToString("yyyyMMddHHmmssfffffff"));
                         AddVMBuilderParameter("endDate", endDate.Value.ToUniversalTime().AddDays(1).AddTicks(-1).ToString("yyyyMMddHHmmssfffffff"));
                     }
-                    RunListViewModel runListViewModel = _runListViewModeBuilder.Build(builderParameters);
-                    return View(runListViewModel);
-                }
-                else
-                {
-                    // Handle the case where only the "url" parameter is provided.
-                    // Build the view model as you did in the original code.
 
-                    RunListViewModel runListViewModel = _runListViewModeBuilder.Build();
-                    return View(runListViewModel);
                 }
+                RunListViewModel runListViewModel = _runListViewModeBuilder.Build(builderParameters);
+                return View(runListViewModel);
             }
             catch (Exception ex)
             {

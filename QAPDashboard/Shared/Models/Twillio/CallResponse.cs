@@ -15,5 +15,6 @@ namespace QAPDashboard.Shared.Models.Twillio
         public string CalledNumber { get; set; } = string.Empty;
         [JsonProperty("status")]
         public string Status { get; set; } = string.Empty;
+        public string CallId { get; set; } = string.Empty;
     }
 }

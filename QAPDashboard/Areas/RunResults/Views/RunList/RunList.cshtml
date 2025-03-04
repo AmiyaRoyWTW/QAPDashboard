@@ -22,7 +22,7 @@
     </div>
     <!-- Right Sidebar - Filter -->
     <div class="flex flex-col justify-center items-center order-2 lg:order-2 w-full lg:w-2/5">
-      <form action="@Url.Content("~/")" class="w-full space-y-6">
+      <form action="@Url.Content("~/run-list/" + Model.TestCaseName)" class="w-full space-y-6">
         <div class="grid grid-cols-2 gap-4">
           @await Component.InvokeAsync("FilterDropdown", new FilterDropdownViewModel() { Id = "testCaseDropdown", Name =
           "testCaseDropdown", Label = "Tests", Options = Model.Runs.TestCases, SelectedItem =
@@ -75,7 +75,7 @@
         {
           <tr class="bg-white hover:bg-sky-50">
             <td class="p-4 border border-gray-300">
-              <a href="/run-result/@call.TestName/@call.CallId" class="text-blue-500 hover:underline">@call.CallId</a>
+              <a href="/run-result/@Model.TestCaseName/@call.CallId" class="text-blue-500 hover:underline">@call.CallId</a>
             </td>
             <td class="p-4 border border-gray-300">@call.Date.ToString("yyyy/MM/dd HH:mm:ss")</td>
             <td class="p-4 border border-gray-300">{EarlyMedia}@call.CalledNumber;From:@call.CallingNumber</td>

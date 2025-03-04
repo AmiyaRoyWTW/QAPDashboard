@@ -1,6 +1,7 @@
 ﻿namespace QAPDashboard.Shared.Models.Twillio
 {
-    public class Runs{
+    public class Runs
+    {
         public List<string> TestCases { get; set; } = [];
         public string SelectedTestCaseFilter { get; set; } = "All";
         public List<string> DateRanges { get; set; } = ["Last 15 Minutes", "Last Hour", "Last 12 Hours", "Last 24 Hours", "This Week", "This Month", "Last Calendar Month", "Custom Range"];
@@ -12,7 +13,6 @@
     public class Calls
     {
         public required string CallId { get; set; }
-        public required string TestName { get; set; }
         public string CallingNumber { get; set; } = String.Empty;
         public string CalledNumber { get; set; } = String.Empty;
         public DateTime Date { get; set; } = DateTime.Now;

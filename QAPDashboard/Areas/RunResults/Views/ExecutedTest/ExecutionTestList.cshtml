@@ -1,0 +1,101 @@
+@using QAPDashboard.Views.Shared.Components.Button
+@using QAPDashboard.Views.Shared.Components.FilterDropdown
+@model ExecutedTestViewModel
+
+@{
+  ViewData["Title"] = "Execution List";
+}
+
+<div class="container mx-auto">
+  <div class="mt-8 text-slate-700 px-4 pt-4 rounded">
+    <h2 class="text-3xl mb-4">Filter Report</h2>
+  </div>
+
+  <div class="w-full flex justify-items-start flex-row lg:flex-row">
+    <form action="@Url.Content("~/")" class="w-1/2 space-y-6">
+      <div class="grid grid-cols-2 gap-4">
+        @await Component.InvokeAsync("FilterDropdown", new FilterDropdownViewModel() { Id = "dateRangeDropdown", Name =
+        "dateRangeDropdown", Label = "Report From", Options = Model.DateRanges, SelectedItem =
+        Model.SelectedDateRange })
+        <input type="hidden" id="dateRangeFilter" name="dateRangeFilter" value="@Model.SelectedDateRange" />
+      </div>
+      <div id="customRange" class="grid grid-rows-2 gap-4" style="display: none;">
+        <div class="w-1/2 grid grid-cols-1 gap-4">
+          <div class="flex items-center">
+            <label for="startDate"
+              class="bg-blue-500 text-white px-2 py-2 text-center w-20 mr-1 rounded-lg">From</label>
+            <input type="date" id="=startDate" name="startDate"
+              class="w-full rounded-lg p-2 focus:outline-none bg-white" value="@Model.CustomStartDate">
+          </div>
+        </div>
+        <div class="w-1/2 grid grid-cols-1 gap-4">
+          <div class="flex items-center">
+            <label for="endDate" class="bg-blue-500 text-white px-2 py-2 text-center w-20 mr-1 rounded-lg">To</label>
+            <input type="date" id="endDate" name="endDate" class="w-full rounded-lg p-2 focus:outline-none bg-white"
+              value="@Model.CustomEndDate">
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col justify-center items-end">
+        @await Component.InvokeAsync("Button", new ButtonViewModel { Type = "submit", Text = "Filter",
+                TailwindClasses = "w-1/2" })
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-8 text-slate-700 px-4 pt-4 rounded">
+    <table id="runsTable" class="w-full bg-white  mt-4 table-auto">
+      <thead class="bg-blue-50 text-slate-700">
+        <tr>
+          <th class="p-4 border border-gray-300">Tests</th>
+          <th class="p-4 border border-gray-300">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var test in Model.ExecutedTests)
+        {
+          <tr>
+            <td class="p-4 border border-gray-300">
+              <a href="/run-list/@test.TestName" class="text-blue-500 hover:underline">@test.TestName</a>
+            </td>
+            <td class="p-4 border border-gray-300">@test.LastExecutionStatus</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<script>
+  const elements = {
+    dateRangeFilterDropdown: document.querySelector("#dateRangeDropdown"),
+    dateRangeFilterInput: document.querySelector("#dateRangeFilter"),
+    dateInputContainer: document.getElementById("customRange"),
+    startDateInput: document.getElementById("startDate"),
+    endDateInput: document.getElementById("endDate"),
+  }
+
+  window.onloadeddata = updateDateRangeFilterInput();
+
+  function updateDateRangeFilterInput() {
+    if (elements.dateRangeFilterInput.value === "Custom Range") {
+      elements.dateInputContainer.style.display = "grid";
+    }
+  }
+
+  function onDateRangeFilterChange(event) {
+    if (event.target.value === "Custom Range") {
+      elements.dateInputContainer.style.display = "grid";
+    } else {
+      elements.dateInputContainer.style.display = "none";
+    }
+    elements.dateRangeFilterInput.value = event.target.value;
+    //event.target.form.submit();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    elements.dateRangeFilterDropdown.addEventListener("change", onDateRangeFilterChange);
+  });
+</script>
