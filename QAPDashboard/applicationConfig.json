@@ -22,8 +22,8 @@
       {
         "AppType": "local",
         "Visible": "True",
-        "Name": "Test Management",
-        "Href": "/test-management"
+        "Name": "TestCase Library",
+        "Href": "/test-library"
       },
       {
         "AppType": "local",

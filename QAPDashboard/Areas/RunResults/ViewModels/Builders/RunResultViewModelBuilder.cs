@@ -26,7 +26,15 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
         public RunResultViewModel Build(List<BuilderParameterDTO> parameters)
         {
             SetBuilderParameters(parameters);
-            return CastToRunResultVM(GetBuilderParameterValue("testCaseName"), GetBuilderParameterValue("testRunId"), _localTestCaseService);
+            var testCaseName = GetBuilderParameterValue("testCaseName");
+            var testRunId = GetBuilderParameterValue("testRunId");
+
+            if (testCaseName == null || testRunId == null)
+            {
+                throw new ArgumentNullException(testCaseName == null ? nameof(testCaseName) : nameof(testRunId));
+            }
+
+            return CastToRunResultVM(testCaseName, testRunId, _localTestCaseService);
         }
 
         private static RunResultViewModel CastToRunResultVM(string testCaseName, string testRunId, ILocalTestCaseService localTestCaseService)

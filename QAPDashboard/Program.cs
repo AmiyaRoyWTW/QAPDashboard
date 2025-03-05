@@ -10,6 +10,9 @@ using QAPDashboard.Shared.Services.TestRuns;
 using QAPDashboard.Shared.Services.TestRunSummaries;
 using QAPDashboard.Shared.Services.ExecutionTestList;
 using QAPDashboard.Settings;
+using QAPDashboard.Shared.Services.TestCasesLibrary;
+using QAPDashboard.Areas.TestCasesLibrary.ViewModels;
+using QAPDashboard.Areas.TestCasesLibrary.ViewModels.Builders;
 
 
 var builderApp = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
@@ -35,11 +38,15 @@ builder.Services.AddSingleton<ILocalTestRunService, LocalTestRunService>();
 builder.Services.AddSingleton<ILocalRunResultService, LocalStorageRunResultsService>();
 builder.Services.AddSingleton<IExecutionTestService, LocalExecutionTestService>();
 builder.Services.AddSingleton<IApplicationSettingsManager, ApplicationSettingManager>();
+builder.Services.AddSingleton<ITestCasesLibraryService, LocalTestCasesLibraryService>();
+builder.Services.AddSingleton<IViewModeBuilder<TestCaseManagementViewModel>, TestCaseManagementViewModelBuilder>();
 
 builder.Services.AddSingleton<IViewModeBuilder<RunListViewModel>, RunListViewModelBuilder>();
 builder.Services.AddSingleton<IViewModeBuilder<RunResultViewModel>, RunResultViewModelBuilder>();
 builder.Services.AddSingleton<IViewModeBuilder<TestResultViewModel>, TestResultViewModelBuilder>();
 builder.Services.AddSingleton<IViewModeBuilder<ExecutedTestViewModel>, ExecutedTestViewModelBuilder>();
+builder.Services.AddSingleton<IViewModeBuilder<TestCasesLibraryViewModel>, TestCasesLibraryViewModelBuilder>();
+builder.Services.AddSingleton<IViewModeBuilder<TestCaseManagementViewModel>, TestCaseManagementViewModelBuilder>();
 
 var app = builder.Build();
 
@@ -60,7 +67,7 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    foreach (string areaName in new[] { "RunResults", "API", "Settings" })
+    foreach (string areaName in new[] { "RunResults", "API", "Settings", "TestCasesLibrary" })
     {
         _ = endpoints.MapAreaControllerRoute(areaName, areaName, "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     }

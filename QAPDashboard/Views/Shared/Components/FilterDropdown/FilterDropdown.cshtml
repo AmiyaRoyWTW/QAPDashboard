@@ -1,16 +1,39 @@
 @model QAPDashboard.Views.Shared.Components.FilterDropdown.FilterDropdownViewModel
 
-<label for="@Model.Id" class="mb-2 mr-2 text-base font-bold text-gray-700 flex flex-col justify-right items-end">@Model.Label</label>
-<select id="@Model.Id" name="@Model.Name"
-    class="w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-400 focus:outline-none cursor-pointer"
-    @((Model.Options != null && (Model.Options.Count > 1 || !string.IsNullOrEmpty(Model.FirstItem))) ? "" : "disabled")>
-    @if (!string.IsNullOrEmpty(Model.FirstItem))
+<label for="@Model.Id"
+    class="mb-2 mr-2 text-base font-bold text-gray-700 flex flex-col justify-right items-end">@Model.Label</label>
+@{
+    @if (Model.IsDisabled)
     {
-        <option value="" selected>@Model.FirstItem</option>
+        <select id="@Model.Id" name="@Model.Name"
+            class="w-full rounded-lg border-2 border-slate-300 p-2 bg-gray-200 transition-colors duration-300 focus:border-blue-400 focus:outline-none cursor-not-allowed"
+            disabled @((Model.Options != null && (Model.Options.Count > 1 || !string.IsNullOrEmpty(Model.FirstItem))) ? "" :
+            "disabled")>
+        @if (!string.IsNullOrEmpty(Model.FirstItem))
+            {
+                <option value="" selected>@Model.FirstItem</option>
+            }
+            @foreach (var option in Model.Options)
+            {
+                <option value="@option" selected="@(!string.IsNullOrEmpty(Model.SelectedItem) && option == Model.SelectedItem)">
+                    @option</option>
+            }
+        </select>
     }
-    @foreach (var option in Model.Options)
+    else
     {
-        <option value="@option" selected="@(!string.IsNullOrEmpty(Model.SelectedItem) && option == Model.SelectedItem)">
-            @option</option>
+        <select id="@Model.Id" name="@Model.Name"
+            class="w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-400 focus:outline-none cursor-pointer"
+            @((Model.Options != null && (Model.Options.Count > 1 || !string.IsNullOrEmpty(Model.FirstItem))) ? "" : "disabled")>
+            @if (!string.IsNullOrEmpty(Model.FirstItem))
+            {
+                <option value="" selected>@Model.FirstItem</option>
+            }
+            @foreach (var option in Model.Options)
+            {
+                <option value="@option" selected="@(!string.IsNullOrEmpty(Model.SelectedItem) && option == Model.SelectedItem)">
+                    @option</option>
+            }
+        </select>
     }
-</select>
+}

@@ -1,6 +1,6 @@
 ﻿namespace QAPDashboard.Shared.Models.Twillio
 {
-    public class TwilioTestCases
+    public class TwilioTestCase
     {
         public List<Tests> Tests { get; set; } = [];
     }

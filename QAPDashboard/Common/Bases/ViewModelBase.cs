@@ -8,8 +8,8 @@ namespace QAPDashboard.Common.Bases
     {
         public ViewModelBase()
         {
-            NavigationBar = UIRunnerConfiguration.NavigationBar;
-            AppType = RunnerConfiguration.ApplicationType;
+            NavigationBar = UIRunnerConfiguration.NavigationBar ?? [];
+            AppType = RunnerConfiguration.ApplicationType ?? string.Empty;
         }
 
         public List<NavigationBarDTO> NavigationBar { get; set; }

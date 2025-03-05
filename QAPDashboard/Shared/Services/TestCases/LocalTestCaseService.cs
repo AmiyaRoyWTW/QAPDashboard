@@ -67,7 +67,7 @@ namespace QAPDashboard.Shared.Services.TestCases
             var twilioTestManagementFile = RunnerConfiguration.TestInventoryFileStoragePath != null
                 ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
                 : [];
-            var twilioTests = JsonConvert.DeserializeObject<TwilioTestCases>(File.ReadAllText(twilioTestManagementFile.First()));
+            var twilioTests = JsonConvert.DeserializeObject<TwilioTestCase>(File.ReadAllText(twilioTestManagementFile.First()));
             return twilioTests?.Tests?.FirstOrDefault(x => x.TestName == testCaseName);
         }
 

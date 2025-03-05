@@ -24,11 +24,11 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
         {
             Runs testRuns;
             SetBuilderParameters(builderParameters);
-            string testCaseName = GetBuilderParameterValue("testCaseName");
-            string testCaseFilter = GetBuilderParameterValue("testCaseFilter");
-            string dateRangeFilter = GetBuilderParameterValue("dateRangeFilter");
-            string startDate = GetBuilderParameterValue("startDate");
-            string endDate = GetBuilderParameterValue("endDate");
+            string testCaseName = GetBuilderParameterValue("testCaseName") ?? string.Empty;
+            string? testCaseFilter = GetBuilderParameterValue("testCaseFilter");
+            string? dateRangeFilter = GetBuilderParameterValue("dateRangeFilter");
+            string? startDate = GetBuilderParameterValue("startDate");
+            string? endDate = GetBuilderParameterValue("endDate");
             if (testCaseFilter != null && dateRangeFilter != null && startDate != null && endDate != null)
             {
                 testRuns = _localTestRunService.GetLocalTestRuns(testCaseName, dateRangeFilter, startDate, endDate);

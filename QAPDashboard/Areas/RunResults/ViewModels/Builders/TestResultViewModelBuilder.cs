@@ -28,19 +28,19 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
         public TestResultViewModel Build(List<BuilderParameterDTO> parameters)
         {
             SetBuilderParameters(parameters);
-            string buildMode = GetBuilderParameterValue("buildMode");
+            string buildMode = GetBuilderParameterValue("buildMode") ?? string.Empty;
 
             switch (buildMode)
             {
                 case "previous":
-                    string testSuite = GetBuilderParameterValue("testSuite");
-                    string testMethod = GetBuilderParameterValue("testMethod");
-                    string baseUrl = GetBuilderParameterValue("baseUrl");
-                    string testStartTime = GetBuilderParameterValue("testStartTime");
+                    string testSuite = GetBuilderParameterValue("testSuite") ?? string.Empty;
+                    string testMethod = GetBuilderParameterValue("testMethod") ?? string.Empty;
+                    string baseUrl = GetBuilderParameterValue("baseUrl") ?? string.Empty;
+                    string testStartTime = GetBuilderParameterValue("testStartTime") ?? string.Empty;
                     return BuildFromPreviousResults(testSuite, testMethod, baseUrl, DateTime.Parse(testStartTime));
                 case "byId":
-                    string testRunId = GetBuilderParameterValue("testRunId");
-                    string testId = GetBuilderParameterValue("testId");
+                    string testRunId = GetBuilderParameterValue("testRunId") ?? string.Empty;
+                    string testId = GetBuilderParameterValue("testId") ?? string.Empty;
                     return BuildFromTestId(testRunId, testId);
                 default:
                     throw new ArgumentException($"Invalid buildMode: {buildMode}");

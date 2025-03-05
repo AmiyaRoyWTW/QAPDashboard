@@ -31,9 +31,9 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
     public ExecutedTestViewModel Build(List<BuilderParameterDTO> builderParameters)
     {
       SetBuilderParameters(builderParameters);
-      string dateRangeFilter = GetBuilderParameterValue("dateRangeFilter");
-      string startDate = GetBuilderParameterValue("startDate");
-      string endDate = GetBuilderParameterValue("endDate");
+      string? dateRangeFilter = GetBuilderParameterValue("dateRangeFilter");
+      string? startDate = GetBuilderParameterValue("startDate");
+      string? endDate = GetBuilderParameterValue("endDate");
       List<ExecutedTests> executedTests = _executionTestRunService.GetLocalExecutedTests(dateRangeFilter, startDate, endDate);
 
       ExecutedTestViewModel executionListVM = new()

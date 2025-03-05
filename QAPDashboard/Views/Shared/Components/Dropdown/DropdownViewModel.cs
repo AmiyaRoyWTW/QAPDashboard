@@ -10,5 +10,6 @@ namespace QAPDashboard.Views.Shared.Components.Dropdown
         public string? Name { get; set; }
         public string? SelectedItem { get; set; }
         public string? FirstItem { get; set; }
+        public bool IsDisabled { get; set; } = false;
     }
 }
