@@ -333,6 +333,9 @@
   .h-18 {
     height: calc(var(--spacing) * 18);
   }
+  .h-50 {
+    height: calc(var(--spacing) * 50);
+  }
   .h-auto {
     height: auto;
   }
@@ -365,6 +368,9 @@
   }
   .w-20 {
     width: calc(var(--spacing) * 20);
+  }
+  .w-50 {
+    width: calc(var(--spacing) * 50);
   }
   .w-full {
     width: 100%;

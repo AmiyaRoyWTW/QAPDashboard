@@ -1,0 +1,36 @@
+{
+  "NavigationSettings": {
+    "NavigationBar": [
+      {
+        "AppType": "all",
+        "Visible": "False",
+        "Name": "Home",
+        "Href": "/home"
+      },
+      {
+        "AppType": "all",
+        "Visible": "True",
+        "Name": "Reports",
+        "Href": "/execution-list"
+      },
+      {
+        "AppType": "local",
+        "Visible": "True",
+        "Name": "Automation Runner",
+        "Href": "/runner"
+      },
+      {
+        "AppType": "local",
+        "Visible": "True",
+        "Name": "Test Management",
+        "Href": "/test-management"
+      },
+      {
+        "AppType": "local",
+        "Visible": "False",
+        "Name": "Application Settings",
+        "Href": "/ApplicationSettings"
+      }
+    ]
+  }
+}

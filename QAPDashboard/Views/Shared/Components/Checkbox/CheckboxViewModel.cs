@@ -2,10 +2,10 @@
 {
     public class CheckboxViewModel
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Class { get; set; }
-        public string Label { get; set; }
-        public string Value { get; set; }
+        public string? Id { get; set; }
+        public string? Name { get; set; }
+        public string? Class { get; set; }
+        public string? Label { get; set; }
+        public string? Value { get; set; }
     }
 }

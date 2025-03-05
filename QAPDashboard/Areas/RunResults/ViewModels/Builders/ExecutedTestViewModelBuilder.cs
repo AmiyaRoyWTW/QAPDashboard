@@ -2,6 +2,7 @@ using System.Globalization;
 using QAPDashboard.Common.Bases;
 using QAPDashboard.Common.DTOs;
 using QAPDashboard.Common.Interfaces;
+using QAPDashboard.Settings;
 using QAPDashboard.Shared.Models.Twillio;
 using QAPDashboard.Shared.Services.ExecutionTestList;
 
@@ -10,10 +11,12 @@ namespace QAPDashboard.Areas.RunResults.ViewModels.Builders
   public class ExecutedTestViewModelBuilder : ViewModelBuilderBase, IViewModeBuilder<ExecutedTestViewModel>
   {
     private readonly IExecutionTestService _executionTestRunService;
+    private readonly IApplicationSettingsManager _applicationSettingsManager;
 
-    public ExecutedTestViewModelBuilder(IExecutionTestService executionTestRunService)
+    public ExecutedTestViewModelBuilder(IExecutionTestService executionTestRunService, IApplicationSettingsManager applicationSettingsManager)
     {
       _executionTestRunService = executionTestRunService;
+      _applicationSettingsManager = applicationSettingsManager;
     }
 
     public ExecutedTestViewModel Build()

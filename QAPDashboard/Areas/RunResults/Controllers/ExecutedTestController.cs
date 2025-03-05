@@ -6,7 +6,7 @@ using QAPDashboard.Common.Interfaces;
 namespace QAPDashboard.Areas.RunResults.Controllers
 {
   [Area("RunResults")]
-  [Route("")]
+  [Route("execution-list")]
   public class ExecutedTestController : TestRunnerControllerBase
   {
     private readonly ILogger<ExecutedTestController> _logger;

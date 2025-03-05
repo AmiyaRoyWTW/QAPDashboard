@@ -12,7 +12,7 @@
   </div>
 
   <div class="w-full flex justify-items-start flex-row lg:flex-row">
-    <form action="@Url.Content("~/")" class="w-1/2 space-y-6">
+    <form action="@Url.Content("~/execution-list")" class="w-1/2 space-y-6">
       <div class="grid grid-cols-2 gap-4">
         @await Component.InvokeAsync("FilterDropdown", new FilterDropdownViewModel() { Id = "dateRangeDropdown", Name =
         "dateRangeDropdown", Label = "Report From", Options = Model.DateRanges, SelectedItem =
@@ -41,6 +41,23 @@
                 TailwindClasses = "w-1/2" })
       </div>
     </form>
+  </div>
+
+  <div class="mt-8 text-slate-700 px-4 pt-4 rounded">
+    <div class="flex justify-between">
+      @foreach (var test in Model.ExecutedTests)
+      {
+        <div class="items-center grid grid-rows-2 gap-4">
+          <div
+            class="relative inline-flex items-center justify-center w-50 h-50 overflow-hidden bg-red-400 rounded-full dark:bg-red-600">
+            @*<span class="font-medium text-gray-600 dark:text-gray-300">JL</span>*@
+          </div>
+          <span class="relative inline-flex items-center justify-center text-2xl text-gray-600 dark:text-gray-300">
+            <a href="/run-list/@test.TestName" class="text-blue-500 hover:underline">@test.TestName</a>
+          </span>
+        </div>
+      }
+    </div>
   </div>
 
   <div class="mt-8 text-slate-700 px-4 pt-4 rounded">

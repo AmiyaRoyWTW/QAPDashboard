@@ -5,6 +5,6 @@ namespace QAPDashboard.Views.Shared.Components.ButtonGroup
 {
     public class ButtonGroupViewModel
     {
-        public List<ButtonViewModel> Buttons { get; set; }
+        public List<ButtonViewModel>? Buttons { get; set; }
     }
 }

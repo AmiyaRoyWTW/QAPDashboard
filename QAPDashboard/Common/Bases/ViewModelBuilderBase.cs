@@ -11,11 +11,11 @@ namespace QAPDashboard.Common.Bases
             builderParameters = [];
         }
 
-        public string GetBuilderParameterValue(string parameterName)
+        public string? GetBuilderParameterValue(string parameterName)
         {
             if (builderParameters != null)
             {
-                BuilderParameterDTO parameter = builderParameters.FirstOrDefault(bp => bp.Name == parameterName);
+                BuilderParameterDTO? parameter = builderParameters.FirstOrDefault(bp => bp.Name == parameterName);
                 return parameter?.Value;
             }
 

@@ -25,8 +25,8 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
     }
     public List<ExecutedTests> GetLocalExecutedTests(string dateRange = "", string startDate = "", string endDate = "")
     {
-      DateTime? selectedStartDate = null;
-      DateTime? selectedEndDate = null;
+      DateTime? selectedStartDate;
+      DateTime? selectedEndDate;
       switch (dateRange)
       {
         case "Today":

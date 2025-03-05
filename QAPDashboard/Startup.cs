@@ -16,6 +16,7 @@ using Azure.Storage.Queues;
 using Azure.Storage.Blobs;
 using Azure.Core.Extensions;
 using QAPDashboard.Shared.Services.ExecutionTestList;
+using QAPDashboard.Settings;
 
 namespace QAPDashboard
 {
@@ -38,6 +39,7 @@ namespace QAPDashboard
             _ = services.AddSingleton<ILocalTestRunService, LocalTestRunService>();
             _ = services.AddSingleton<ILocalRunResultService, LocalStorageRunResultsService>();
             _ = services.AddSingleton<IExecutionTestService, LocalExecutionTestService>();
+            _ = services.AddSingleton<IApplicationSettingsManager, ApplicationSettingManager>();
 
             _ = services.AddSingleton<IViewModeBuilder<RunListViewModel>, RunListViewModelBuilder>();
             _ = services.AddSingleton<IViewModeBuilder<RunResultViewModel>, RunResultViewModelBuilder>();
@@ -56,7 +58,7 @@ namespace QAPDashboard
             _ = app.UseRouting();
             _ = app.UseEndpoints(endpoints =>
             {
-                foreach (string areaName in new[] { "RunResults" })
+                foreach (string areaName in new[] { "RunResults", "API", "Settings" })
                 {
                     _ = endpoints.MapAreaControllerRoute(areaName, areaName, "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 }

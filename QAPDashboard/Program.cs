@@ -9,6 +9,7 @@ using QAPDashboard.Shared.Services.TestRunResults;
 using QAPDashboard.Shared.Services.TestRuns;
 using QAPDashboard.Shared.Services.TestRunSummaries;
 using QAPDashboard.Shared.Services.ExecutionTestList;
+using QAPDashboard.Settings;
 
 
 var builderApp = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
@@ -33,6 +34,7 @@ builder.Services.AddSingleton<ITestRunSummaryService, AzureTestRunSummaryService
 builder.Services.AddSingleton<ILocalTestRunService, LocalTestRunService>();
 builder.Services.AddSingleton<ILocalRunResultService, LocalStorageRunResultsService>();
 builder.Services.AddSingleton<IExecutionTestService, LocalExecutionTestService>();
+builder.Services.AddSingleton<IApplicationSettingsManager, ApplicationSettingManager>();
 
 builder.Services.AddSingleton<IViewModeBuilder<RunListViewModel>, RunListViewModelBuilder>();
 builder.Services.AddSingleton<IViewModeBuilder<RunResultViewModel>, RunResultViewModelBuilder>();
@@ -58,11 +60,12 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    foreach (string areaName in new[] { "RunResults" })
+    foreach (string areaName in new[] { "RunResults", "API", "Settings" })
     {
         _ = endpoints.MapAreaControllerRoute(areaName, areaName, "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     }
 
     _ = endpoints.MapControllers();
 });
+app.MapGet("/", () => Results.Redirect("/execution-list"));
 app.Run();

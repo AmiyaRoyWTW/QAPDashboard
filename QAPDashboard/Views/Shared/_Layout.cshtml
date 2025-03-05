@@ -23,19 +23,19 @@
                     <text x="10" y="40" font-family="Arial" font-size="22" fill="#FFFFFF">Twilio Automation</text>
                 </svg>
 
-                @*@if (Model != null && Model.NavigationBar != null)
+                @if (Model?.NavigationBar != null)
                 {
                     @foreach (var navigationLink in Model.NavigationBar)
                     {
                         if (navigationLink.Visible && (navigationLink.AppType.ToLower() == "all" || Model.AppType == navigationLink.AppType))
                         {
-                            var paintClassIfIsCurrentUrl = navigationLink.Href == @Url.RouteUrl(ViewContext.RouteData.Values) ? "bg-bluegw-900 text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:scale-105 cursor-pointer transform-gpu transition-all" : "text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:scale-105 cursor-pointer transition-all";
+                            var paintClassIfIsCurrentUrl = navigationLink.Href == @Url.RouteUrl(ViewContext.RouteData.Values) ? "bg-blue-900 text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:scale-105 cursor-pointer transform-gpu transition-all" : "text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:scale-105 cursor-pointer transition-all";
                             <div class="navAreas">
-                                <a class="@paintClassIfIsCurrentUrl group mb-2 mr-2 flex space-x-4 rounded-lg rounded-md px-4 px-7 py-2.5 py-3 text-white" href="@navigationLink.Href" onclick="hideSidebarOnSmallScreens()">@navigationLink.Name</a>
+                                <a class="@paintClassIfIsCurrentUrl group mb-2 mr-2 flex space-x-4 rounded-md px-7 py-2.5 text-white" href="@navigationLink.Href" onclick="hideSidebarOnSmallScreens()">@navigationLink.Name</a>
                             </div>
                         }
                     }
-                }*@
+                }
             </div>
         </div>
 
