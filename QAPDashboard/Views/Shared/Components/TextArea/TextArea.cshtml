@@ -1,0 +1,25 @@
+﻿@model QAPDashboard.Views.Shared.Components.TextArea.TextAreaViewModel
+
+@if (Model.Label != null)
+{
+  <label for="@Model.Id" class="mb-2 block text-base font-medium text-gray-700">@Model.Label</label>
+}
+
+<textarea
+@{
+  var className="";
+  @if (!Model.Enabled)
+  {
+    className="p-2 w-full rounded-lg word-break transition-colors duration-300 focus:border-blue-300 focus:outline-none cursor-not-allowed bg-gray-200 border-none";
+  }
+  else
+  {
+    className="p-2 w-full rounded-lg word-break transition-colors duration-300 focus:border-blue-300 focus:outline-none resize border-none";
+  }
+}
+id="@Model.Id" name="@Model.Name" rows="2"
+  class="@className"
+  style="overflow:hidden"
+  @(Model.Enabled ? "" : "disabled") >
+  @Model.Value
+</textarea>

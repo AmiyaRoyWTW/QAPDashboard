@@ -613,6 +613,9 @@
   .pl-10 {
     padding-left: calc(var(--spacing) * 10);
   }
+  .text-wrap {
+    text-wrap: wrap;
+  }
   .text-center {
     text-align: center;
   }
@@ -777,6 +780,9 @@
   .ease-in-out {
     --tw-ease: var(--ease-in-out);
     transition-timing-function: var(--ease-in-out);
+  }
+  .word-break {
+    word-break: break-all;
   }
   .hover\:scale-105 {
     &:hover {

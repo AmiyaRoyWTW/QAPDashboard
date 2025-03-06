@@ -2,7 +2,9 @@
 @using QAPDashboard.Views.Shared.Components.Dropdown
 @using QAPDashboard.Views.Shared.Components.FilterDropdown
 @using QAPDashboard.Views.Shared.Components.Input
+@using QAPDashboard.Views.Shared.Components.Paragraph
 @using QAPDashboard.Views.Shared.Components.TableRowInput
+@using QAPDashboard.Views.Shared.Components.TextArea
 @model TestCaseManagementViewModel
 
 @{
@@ -19,25 +21,26 @@
       <div class="mt-8 text-slate-700 px-4 pt-4 rounded">
         <h2 class="text-2xl text-slate-700">TestCase Details</h2>
       </div>
-      <form id="testcaseConfiguration" name="testcaseConfiguration" method="post" action="test-management/test-submit">
+      <form id="testcaseConfiguration" name="testcaseConfiguration" method="post" action="test-submit">
+        <input id="oldTestName" name="oldTestName" type="text" hidden value="@Model.TwilioTestCase.TestName" />
         <div id="channelType">
           <input id="channelTypeInput" name="channelTypeInput" type="text" hidden value="voice" />
           @await Component.InvokeAsync("Dropdown", new DropdownViewModel() { Id = "channelTypeDropdown", Label =
           "Channel", Options = ["voice"], FirstItem = "voice", IsDisabled = true })
         </div>
         <div id="testName">
-          @await Component.InvokeAsync("Input", new InputViewModel() { Id = "testNameInput", Label = "Name", Value = Model.TwilioTestCase.TestName})
+          @await Component.InvokeAsync("Input", new InputViewModel() { Id = "testNameInput", Name="TestName", Label = "Name", Value = @Model.TwilioTestCase.TestName})
         </div>
         <div id="testType">
           <input id="testTypeInput" name="testTypeInput" type="text" hidden value="Inbound" />
           @await Component.InvokeAsync("Dropdown", new DropdownViewModel() { Id = "testTypeDropdown", Label = "Test Type", Options = ["Inbound"], FirstItem = "Inbound", IsDisabled = true })
         </div>
         <div id="testDescription">
-          @await Component.InvokeAsync("Input", new InputViewModel() { Id = "testDescriptionInput", Label = "Description", Value = Model.TwilioTestCase.TestDescription})
+          @await Component.InvokeAsync("Input", new InputViewModel() { Id = "testDescriptionInput", Name = "TestDescription", Label = "Description", Value = @Model.TwilioTestCase.TestDescription})
         </div>
         <div class="mt-8 text-slate-700 px-4 pt-4 rounded">
           <h2 class="text-2xl text-slate-700">Associated Steps</h2>
-          <table id="runsTable" class="w-full bg-white  mt-4 table-auto">
+          <table id="stepsTable" class="w-full bg-white mt-4 table-auto">
             <thead class="bg-blue-50 text-slate-700">
               <tr>
                 <th class="p-4 border border-gray-100">Step</th>
@@ -47,63 +50,152 @@
               </tr>
             </thead>
             <tbody>
-            @foreach (var step in Model.TwilioTestCase.TestSteps)
-            {
-              <tr>
-                <td class="p-4 border border-gray-100">@step.Id</td>
-                <td class="p-4 border border-gray-100">
-                  @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"stepDescription_{step.Id}", Value = step.StepName })
-                </td>
-                <td class="p-4 border border-gray-100">
-                  @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"expectedResult_{step.Id}", Value = step.ExpectedResult })
-                </td>
-                <td class="p-4 border border-gray-100">
-                  @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"replyWith_{step.Id}", Value = step.ReplyWith })
-                </td>
-              </tr>
-            }
+              @{
+                var id = 0;
+                var stepId = 1;
+                @foreach (var step in Model.TwilioTestCase.TestSteps)
+                {
+                  <tr>
+                    <td class="p-4 border border-gray-100">
+                      @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"stepId_{id}", Name = $"TestSteps[{@id}].Id", Value = (@stepId).ToString(), Enabled = false })
+                    </td>
+                    <td class="p-4 border border-gray-100">
+                      @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"stepDescription_{id}", Name = $"TestSteps[{@id}].StepName", Value = @step.StepName })
+                    </td>
+                    <td class="p-4 border border-gray-100">
+                      @await Component.InvokeAsync("Paragraph", new ParagraphViewModel() { Id = $"expectedResult_{id}", Name = $"TestSteps[{@id}].ExpectedResult", Value = @step.ExpectedResult, HiddenInput = true, Editable = true })
+                    </td>
+                    <td class="p-4 border border-gray-100">
+                      @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"replyWith_{id}", Name = $"TestSteps[{@id}].ReplyWith", Value = @step.ReplyWith })
+                    </td>
+                  </tr>
+                  id++;
+                  stepId++;
+                }
+              }
             </tbody>
           </table>
-          <div class="flex flex-col justify-center items-center">
-          @await Component.InvokeAsync("Button", new ButtonViewModel { Type = "button", Text = "Edit Test",
+          <div class="w-1/2 flex flex-row justify-center items-center mt-4 mr-2">
+          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Edit", Type = "submit", Text = "Edit Test",
+                    TailwindClasses = "w-1/2 mr-4" })
+          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "AddStep", Type = "button", Text = "Add Step",
                     TailwindClasses = "w-1/2" })
-        </div>
+          </div>
         </div>
       </form>
     </div>
   </div>
-
 </div>
 
+@*<script>
+  const form = document.getElementById("testcaseConfiguration");
+  const submitter = document.querySelector("#Edit");
+  const formData = new FormData(form, submitter);
+
+  const output = document.getElementById("output");
+
+for (const [key, value] of formData) {
+  output.textContent += `${key}: ${value}\n`;
+}
+</script>*@
 
 <script>
   const elements = {
-    dateRangeFilterDropdown: document.querySelector("#dateRangeDropdown"),
-    dateRangeFilterInput: document.querySelector("#dateRangeFilter"),
-    dateInputContainer: document.getElementById("customRange"),
-    startDateInput: document.getElementById("startDate"),
-    endDateInput: document.getElementById("endDate"),
-  }
-
-  window.onloadeddata = updateDateRangeFilterInput();
-
-  function updateDateRangeFilterInput() {
-    if (elements.dateRangeFilterInput.value === "Custom Range") {
-      elements.dateInputContainer.style.display = "grid";
+      editButton: document.querySelector("#Edit"),
+      addStepButton: document.querySelector("#AddStep")
+    }
+  function updateParagraph(event) {
+    const paragraphs = document.getElementsByTagName("p");
+    for (let i = 0; i < paragraphs.length; i++) {
+      var inputEl = document.getElementById(paragraphs[i].id);
+      inputEl.value = paragraphs[i].textContent;
     }
   }
 
-  function onDateRangeFilterChange(event) {
-    if (event.target.value === "Custom Range") {
-      elements.dateInputContainer.style.display = "grid";
-    } else {
-      elements.dateInputContainer.style.display = "none";
-    }
-    elements.dateRangeFilterInput.value = event.target.value;
-    //event.target.form.submit();
+  function addNewStep(event){
+      let stepTable = document.getElementById("stepsTable");
+      const rowCount = stepTable.rows.length;
+      var existingRow = stepTable.rows[rowCount - 1];
+      let newRow = stepTable.insertRow(rowCount);
+      let cell1 = newRow.insertCell(0);
+      let cell2 = newRow.insertCell(1);
+      let cell3 = newRow.insertCell(2);
+      let cell4 = newRow.insertCell(3);
+      cell1.className = existingRow.cells[0].className;
+      cell2.className = "p-4 border border-gray-100";
+      cell3.className = "p-4 border border-gray-100";
+      cell4.className = "p-4 border border-gray-100";
+      cell1.innerHTML = existingRow.cells[0].innerHTML.replace(`stepId_${rowCount-2}`, `stepId_${rowCount-1}`).replace(`TestSteps[${rowCount-2}].Id`, `TestSteps[${rowCount-1}].Id`);
+      cell2.innerHTML = existingRow.cells[1].innerHTML.replace(`stepDescription_${rowCount-2}`, `stepDescription_${rowCount-1}`).replace(`TestSteps[${rowCount-2}].StepName`, `TestSteps[${rowCount-1}].StepName`);
+      cell3.innerHTML = existingRow.cells[2].innerHTML.replaceAll(`expectedResult_${rowCount-2}`, `expectedResult_${rowCount-1}`).replaceAll(`TestSteps[${rowCount-2}].ExpectedResult`, `TestSteps[${rowCount-1}].ExpectedResult`);
+      cell4.innerHTML = existingRow.cells[3].innerHTML.replace(`replyWith_${rowCount-2}`, `replyWith_${rowCount-1}`).replace(`TestSteps[${rowCount-2}].ReplyWith`, `TestSteps[${rowCount-1}].ReplyWith`);
+      cell1.children[0].value = rowCount;
+      cell2.children[0].value = "";
+      cell3.children[1].textContent = "";
+      cell4.children[0].value = "";
   }
+
+  function addNewStepOptmizedNotWorking(event) {
+    let stepTable = document.getElementById("stepsTable");
+    const rowCount = stepTable.rows.length;
+    let existingRow = stepTable.rows[rowCount - 1];
+
+    // Create the new row
+    let newRow = stepTable.insertRow(rowCount);
+
+    // Use a helper function to handle cell creation and population
+    function createCell(cell, content, className, replacePattern) {
+        cell.className = className;
+        cell.innerHTML = content.replaceAll(replacePattern.old, replacePattern.new);
+    }
+
+    // Reusable class name for the common cells
+    const commonClass = "p-4 border border-gray-100";
+
+    // Define the replacement patterns once
+    let replacePatterns = [
+        {
+            cellIndex: 0,
+            old: `stepId_${rowCount - 2}`,
+            new: `stepId_${rowCount - 1}`,
+        },
+        {
+            cellIndex: 1,
+            old: `stepDescription_${rowCount - 2}`,
+            new: `stepDescription_${rowCount - 1}`,
+        },
+        {
+            cellIndex: 2,
+            old: `expectedResult_${rowCount - 2}`,
+            new: `expectedResult_${rowCount - 1}`,
+        },
+        {
+            cellIndex: 3,
+            old: `replyWith_${rowCount - 2}`,
+            new: `replyWith_${rowCount - 1}`,
+        }
+    ];
+
+    // Cell 1
+    createCell(newRow.insertCell(0), existingRow.cells[0].innerHTML, commonClass, replacePatterns[0]);
+    // Cell 2, 3, and 4 with common class
+    for (let i = 1; i <= 3; i++) {
+        newRow.insertCell(i).className = commonClass;
+    }
+    createCell(newRow.cells[1], existingRow.cells[1].innerHTML, commonClass, replacePatterns[1]);
+    createCell(newRow.cells[2], existingRow.cells[2].innerHTML, commonClass, replacePatterns[2]);
+    createCell(newRow.cells[3], existingRow.cells[3].innerHTML, commonClass, replacePatterns[3]);
+
+    // Set values for the new row's elements
+    newRow.cells[0].children[0].value = rowCount;      // Cell 1
+    newRow.cells[1].children[0].value = "";            // Cell 2
+    newRow.cells[2].children[1].textContent = "";      // Cell 3
+    newRow.cells[3].children[0].value = "";            // Cell 4
+  }
+
 
   document.addEventListener("DOMContentLoaded", () => {
-    elements.dateRangeFilterDropdown.addEventListener("change", onDateRangeFilterChange);
-  });
-</script>
+      elements.editButton.addEventListener("click", updateParagraph);
+      elements.addStepButton.addEventListener("click", addNewStep);
+    });
+  </script>

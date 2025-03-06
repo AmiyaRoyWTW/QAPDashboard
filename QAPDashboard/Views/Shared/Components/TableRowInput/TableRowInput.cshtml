@@ -5,7 +5,7 @@
   var className="";
   @if (!Model.Enabled)
   {
-    className="w-full rounded-lg p-2 transition-colors duration-300 focus:border-blue-300 focus:outline-none border-none cursor-not-allowed bg-gray-200";
+    className="w-full rounded-lg p-2 transition-colors duration-300 focus:border-blue-300 focus:outline-none border-none cursor-not-allowed";
   }
   else
   {
@@ -14,4 +14,4 @@
 }
 id="@Model.Id" name="@Model.Name" type="text"
   class="@className"
-  value="@Model.Value" @(Model.Enabled ? "" : "disabled") />
+  value="@Model.Value" @(Model.Enabled ? "" : "disabled") @(!Model.Hidden ? "" : "hidden")/>

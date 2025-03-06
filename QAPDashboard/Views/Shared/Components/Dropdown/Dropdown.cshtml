@@ -6,7 +6,7 @@
     @if (Model.IsDisabled)
     {
         <select id="@Model.Id" name="@Model.Name" disabled
-            class="w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-400 focus:outline-none cursor-not-allowed"
+            class="w-full rounded-lg border-2 border-slate-300 p-2 transition-colors duration-300 focus:border-blue-400 focus:outline-none cursor-not-allowed bg-gray-200"
             @((Model.Options != null && (Model.Options.Count > 1 || !string.IsNullOrEmpty(Model.FirstItem))) ? "" : "disabled")>
             @if (!string.IsNullOrEmpty(Model.FirstItem))
             {

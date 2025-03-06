@@ -383,7 +383,6 @@ node_modules/
 **/InstallUtil.InstallLog
 
 #Launch Settings
-**/launchSettings.json
 **/launch.json
 **/tasks.json
 
@@ -391,6 +390,5 @@ node_modules/
 *.DS_Store
 /XunitTestProjectDemo/CalculatorUnitTests/Reports
 
-
-#npm specific files
-node_modules/
+#Ignore mvc properties
+**/launchSettings.json

@@ -1,4 +1,4 @@
-using QAPDashboard.Shared.Models;
+using QAPDashboard.Areas.TestCasesLibrary.Models;
 using QAPDashboard.Shared.Models.Twillio;
 
 namespace QAPDashboard.Shared.Services.TestCasesLibrary
@@ -8,5 +8,6 @@ namespace QAPDashboard.Shared.Services.TestCasesLibrary
     string[] GetLocalTestNames();
     List<TwilioTestCase> GetTwilioTestCases();
     Tests GetTwilioTestCase(string testName);
+    void UpdateTwilioTestCase(TwilioTestCaseForm testCaseForm);
   }
 }

@@ -9,5 +9,6 @@
         public string? Svg { get; set; }
         public string? Type { get; set; }
         public string? TailwindClasses { get; set; }
+        public string Event { get; set; } = string.Empty;
     }
 }

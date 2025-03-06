@@ -1,0 +1,26 @@
+﻿@model QAPDashboard.Views.Shared.Components.Paragraph.ParagraphViewModel
+
+@{
+  var className = "";
+  if (!Model.Enabled)
+  {
+    className = "p-2 w-full rounded-lg transition-colors duration-300 focus:border-blue-300 focus:outline-none border-none";
+  }
+  else
+  {
+    className = "p-2 w-full rounded-lg transition-colors duration-300 focus:border-blue-300 focus:outline-none border-none";
+  }
+}
+
+@if (Model.Label != null)
+{
+  <label for="@Model.Id" class="mb-2 block text-base font-medium text-gray-700">@Model.Label</label>
+}
+
+@if (Model.HiddenInput)
+{
+  <input id="@Model.Id" name="@Model.Name" type="text" hidden value="@Model.Value" />
+}
+
+<p id="@Model.Id" name="@Model.Name" class="@className" @(!Model.Editable ? "" : "contenteditable=true")>@Model.Value
+</p>

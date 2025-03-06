@@ -4,7 +4,8 @@
     if (String.IsNullOrEmpty(Model.Label))
     {
         <button id="@Model.Id" name="@Model.Name" type="@Model.Type"
-            class="@Model.TailwindClasses border-blue-800 rounded-md border bg-blue-400 px-4 py-2 font-semibold text-black transition-colors duration-300 hover:border-blue-200 hover:bg-blue-200 hover:scale-105 focus:outline-none cursor-pointer">@Model.Text</button>
+            class="@Model.TailwindClasses border-blue-800 rounded-md border bg-blue-400 px-4 py-2 font-semibold text-black transition-colors duration-300 hover:border-blue-200 hover:bg-blue-200 hover:scale-105 focus:outline-none cursor-pointer"
+            @(Model.Event)>@Model.Text</button>
     }
     else
     {
