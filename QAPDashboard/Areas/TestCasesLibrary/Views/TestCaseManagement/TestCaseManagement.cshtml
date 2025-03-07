@@ -1,4 +1,5 @@
 @using QAPDashboard.Views.Shared.Components.Button
+@using QAPDashboard.Views.Shared.Components.Checkbox
 @using QAPDashboard.Views.Shared.Components.Dropdown
 @using QAPDashboard.Views.Shared.Components.FilterDropdown
 @using QAPDashboard.Views.Shared.Components.Input
@@ -43,6 +44,7 @@
           <table id="stepsTable" class="w-full bg-white mt-4 table-auto">
             <thead class="bg-blue-50 text-slate-700">
               <tr>
+                <th class="p-4 border border-gray-100"></th>
                 <th class="p-4 border border-gray-100">Step</th>
                 <th class="p-4 border border-gray-100">Description</th>
                 <th class="p-4 border border-gray-100">Expect to Hear</th>
@@ -56,6 +58,9 @@
                 @foreach (var step in Model.TwilioTestCase.TestSteps)
                 {
                   <tr>
+                    <td class="p-4 border border-gray-100">
+                      @await Component.InvokeAsync("Checkbox", new CheckboxViewModel() { Id = $"check_{id}", Name = $"TestSteps[{@id}].IsSelected", Value = "true" })
+                    </td>
                     <td class="p-4 border border-gray-100">
                       @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"stepId_{id}", Name = $"TestSteps[{@id}].Id", Value = (@stepId).ToString(), Enabled = false })
                     </td>
@@ -80,6 +85,10 @@
                     TailwindClasses = "w-1/2 mr-4" })
           @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "AddStep", Type = "button", Text = "Add Step",
                     TailwindClasses = "w-1/2" })
+          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Delete", Type = "button", Text = "Delete", IsHidden = true,
+                    TailwindClasses = "w-1/2" })
+          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Save", Type = "button", Text = "Save", IsHidden = true,
+                    TailwindClasses = "w-1/2" })
           </div>
         </div>
       </form>
@@ -102,8 +111,25 @@ for (const [key, value] of formData) {
 <script>
   const elements = {
       editButton: document.querySelector("#Edit"),
-      addStepButton: document.querySelector("#AddStep")
+      addStepButton: document.querySelector("#AddStep"),
+      deleteButton: document.querySelector("#Delete"),
+      saveButton: document.querySelector("#Save"),
+      stepTable: document.querySelector("#stepsTable")
     }
+
+  function enableDisableDeleteButton(event) {
+    let deleteEnabled = false;
+    let stepChecks = document.querySelectorAll("input[type=checkbox]");
+    for (let i = 0; i < stepChecks.length; i++) {
+      if (stepChecks[i].checked) {
+        deleteEnabled = true;
+        break;
+      }
+    }
+    (deleteEnabled) ? elements.deleteButton.hidden = false : elements.deleteButton.hidden = true;
+    (deleteEnabled) ? elements.saveButton.hidden = false : elements.saveButton.hidden = true;
+  }
+
   function updateParagraph(event) {
     const paragraphs = document.getElementsByTagName("p");
     for (let i = 0; i < paragraphs.length; i++) {
@@ -112,90 +138,107 @@ for (const [key, value] of formData) {
     }
   }
 
-  function addNewStep(event){
+  function addNewStep(){
       let stepTable = document.getElementById("stepsTable");
       const rowCount = stepTable.rows.length;
-      var existingRow = stepTable.rows[rowCount - 1];
+      var existingRow = elements.stepTable.rows[1];
       let newRow = stepTable.insertRow(rowCount);
       let cell1 = newRow.insertCell(0);
       let cell2 = newRow.insertCell(1);
       let cell3 = newRow.insertCell(2);
       let cell4 = newRow.insertCell(3);
-      cell1.className = existingRow.cells[0].className;
-      cell2.className = "p-4 border border-gray-100";
-      cell3.className = "p-4 border border-gray-100";
-      cell4.className = "p-4 border border-gray-100";
-      cell1.innerHTML = existingRow.cells[0].innerHTML.replace(`stepId_${rowCount-2}`, `stepId_${rowCount-1}`).replace(`TestSteps[${rowCount-2}].Id`, `TestSteps[${rowCount-1}].Id`);
-      cell2.innerHTML = existingRow.cells[1].innerHTML.replace(`stepDescription_${rowCount-2}`, `stepDescription_${rowCount-1}`).replace(`TestSteps[${rowCount-2}].StepName`, `TestSteps[${rowCount-1}].StepName`);
-      cell3.innerHTML = existingRow.cells[2].innerHTML.replaceAll(`expectedResult_${rowCount-2}`, `expectedResult_${rowCount-1}`).replaceAll(`TestSteps[${rowCount-2}].ExpectedResult`, `TestSteps[${rowCount-1}].ExpectedResult`);
-      cell4.innerHTML = existingRow.cells[3].innerHTML.replace(`replyWith_${rowCount-2}`, `replyWith_${rowCount-1}`).replace(`TestSteps[${rowCount-2}].ReplyWith`, `TestSteps[${rowCount-1}].ReplyWith`);
-      cell1.children[0].value = rowCount;
-      cell2.children[0].value = "";
-      cell3.children[1].textContent = "";
-      cell4.children[0].value = "";
+      let cell5 = newRow.insertCell(4);
+      const className = existingRow.cells[0].className;
+      cell1.className = className;
+      cell2.className = className;
+      cell3.className = className;
+      cell4.className = className;
+      cell5.className = className;
+      updateTableElementProperties(newRow, existingRow, rowCount-2, "new");
+      elements.saveButton.hidden = false;
   }
 
-  function addNewStepOptmizedNotWorking(event) {
-    let stepTable = document.getElementById("stepsTable");
-    const rowCount = stepTable.rows.length;
-    let existingRow = stepTable.rows[rowCount - 1];
-
-    // Create the new row
-    let newRow = stepTable.insertRow(rowCount);
-
-    // Use a helper function to handle cell creation and population
-    function createCell(cell, content, className, replacePattern) {
-        cell.className = className;
-        cell.innerHTML = content.replaceAll(replacePattern.old, replacePattern.new);
+  function updateTableElementProperties(tableRow, existingRow, newIndex, rowType){
+    let stepDescription = "";
+    let expectedResult = "";
+    let replyWith = "";
+    if(rowType == "existing"){
+      stepDescription = tableRow.cells[2].children[0].value;
+      expectedResult = tableRow.cells[3].children[1].textContent;
+      replyWith = tableRow.cells[4].children[0].value;
+    }
+    for (let i = 0; i < tableRow.cells.length; i++) {
+      tableRow.cells[i].innerHTML = existingRow.cells[i].innerHTML;
     }
 
-    // Reusable class name for the common cells
-    const commonClass = "p-4 border border-gray-100";
+    tableRow.cells[0].children[1].value = "true";
+    tableRow.cells[1].children[0].value = "";
+    tableRow.cells[2].children[0].value = stepDescription;
+    tableRow.cells[3].children[1].textContent = expectedResult;
+    tableRow.cells[4].children[0].value = replyWith;
+  }
 
-    // Define the replacement patterns once
-    let replacePatterns = [
-        {
-            cellIndex: 0,
-            old: `stepId_${rowCount - 2}`,
-            new: `stepId_${rowCount - 1}`,
-        },
-        {
-            cellIndex: 1,
-            old: `stepDescription_${rowCount - 2}`,
-            new: `stepDescription_${rowCount - 1}`,
-        },
-        {
-            cellIndex: 2,
-            old: `expectedResult_${rowCount - 2}`,
-            new: `expectedResult_${rowCount - 1}`,
-        },
-        {
-            cellIndex: 3,
-            old: `replyWith_${rowCount - 2}`,
-            new: `replyWith_${rowCount - 1}`,
+  function arrangeTableRows() {
+    const table = document.getElementById("stepsTable");
+    for (let i = 1; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        row.cells[1].children[0].value = i;
+        for (let j = 0; j < row.cells.length; j++) {
+            updateIdAndNamePropertyIndex(row.cells[j], i - 1);
         }
-    ];
-
-    // Cell 1
-    createCell(newRow.insertCell(0), existingRow.cells[0].innerHTML, commonClass, replacePatterns[0]);
-    // Cell 2, 3, and 4 with common class
-    for (let i = 1; i <= 3; i++) {
-        newRow.insertCell(i).className = commonClass;
     }
-    createCell(newRow.cells[1], existingRow.cells[1].innerHTML, commonClass, replacePatterns[1]);
-    createCell(newRow.cells[2], existingRow.cells[2].innerHTML, commonClass, replacePatterns[2]);
-    createCell(newRow.cells[3], existingRow.cells[3].innerHTML, commonClass, replacePatterns[3]);
-
-    // Set values for the new row's elements
-    newRow.cells[0].children[0].value = rowCount;      // Cell 1
-    newRow.cells[1].children[0].value = "";            // Cell 2
-    newRow.cells[2].children[1].textContent = "";      // Cell 3
-    newRow.cells[3].children[0].value = "";            // Cell 4
   }
 
+  function updateIdAndNamePropertyIndex(tableCell, newIndex) {
+    for (let i = 0; i < tableCell.children.length; i++) {
+        const child = tableCell.children[i];  // To avoid repeated lookup
+
+        // Check and update id if it's a non-empty string
+        if (typeof child.id === 'string' && child.id) {
+            child.id = child.id.replace(/_\d+/, `_${newIndex}`);
+        }
+
+        // Check and update name if it's a non-empty string
+        if (typeof child.name === 'string' && child.name) {
+            child.name = child.name.replace(/\[\d+\]/, `[${newIndex}]`);
+        }
+    }
+  }
+
+  function deleteSteps(event){
+    let stepTable = document.getElementById("stepsTable");
+    let stepChecks = document.querySelectorAll("input[type=checkbox]");
+    let deletedRows = 0;
+    for (let i = 0; i < stepChecks.length; i++) {
+      if (stepChecks[i].checked) {
+        var rowId = i+1-deletedRows;
+        stepTable.deleteRow(rowId);
+        if(stepTable.rows[rowId] != null){
+          updateTableElementProperties(stepTable.rows[rowId], stepTable.rows[rowId], rowId, "existing");
+        }
+        deletedRows++;
+      }
+    }
+    enableDisableDeleteButton();
+    elements.saveButton.hidden = false;
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
       elements.editButton.addEventListener("click", updateParagraph);
       elements.addStepButton.addEventListener("click", addNewStep);
+      /*document.querySelectorAll("input[type=checkbox]").forEach((stepCheck) => {
+        stepCheck.addEventListener("change", enableDisableDeleteButton);
+      });*/
+      elements.deleteButton.addEventListener("click", deleteSteps);
+      elements.saveButton.addEventListener("click", arrangeTableRows);
     });
+
+    // Add event listener to a parent container (like the body or form)
+    document.body.addEventListener("change", function(event) {
+      // Check if the target is a checkbox
+      if (event.target && event.target.type === "checkbox") {
+        enableDisableDeleteButton(event);
+      }
+    });
+
   </script>

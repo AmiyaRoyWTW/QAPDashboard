@@ -7,5 +7,6 @@
         public string? Class { get; set; }
         public string? Label { get; set; }
         public string? Value { get; set; }
+        public bool IsChecked { get; set; } = false;
     }
 }

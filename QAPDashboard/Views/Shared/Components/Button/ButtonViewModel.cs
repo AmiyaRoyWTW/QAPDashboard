@@ -10,5 +10,7 @@
         public string? Type { get; set; }
         public string? TailwindClasses { get; set; }
         public string Event { get; set; } = string.Empty;
+        public bool IsDisabled { get; set; } = false;
+        public bool IsHidden { get; set; } = false;
     }
 }
