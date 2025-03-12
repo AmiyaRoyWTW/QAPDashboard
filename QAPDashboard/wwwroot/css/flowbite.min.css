@@ -3184,6 +3184,11 @@
         translate: var(--tw-translate-x)var(--tw-translate-y)
     }
 
+    .-translate-y-1\/3 {
+        --tw-translate-y: calc(calc(1/3*100%)*-1);
+        translate: var(--tw-translate-x)var(--tw-translate-y)
+    }
+
     .-translate-y-3 {
         --tw-translate-y: calc(var(--spacing)*-3);
         translate: var(--tw-translate-x)var(--tw-translate-y)
@@ -3267,6 +3272,22 @@
 
     .animate-spin {
         animation: var(--animate-spin)
+    }
+
+    .animate-bounce {
+        animation: var(--animate-bounce);
+            /* bounce 1s infinite */
+            @keyframes bounce {
+                0%,
+                100% {
+                    transform: translateY(-25%);
+                    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+                }
+                50% {
+                    transform: none;
+                    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+                }
+            }
     }
 
     .cursor-not-allowed {

@@ -44,11 +44,12 @@
           <table id="stepsTable" class="w-full bg-white mt-4 table-auto">
             <thead class="bg-blue-50 text-slate-700">
               <tr>
-                <th class="p-4 border border-gray-100"></th>
+                @*<th class="p-4 border border-gray-100"></th>*@
                 <th class="p-4 border border-gray-100">Step</th>
                 <th class="p-4 border border-gray-100">Description</th>
                 <th class="p-4 border border-gray-100">Expect to Hear</th>
                 <th class="p-4 border border-gray-100">Reply With</th>
+                <th class="p-4 border border-gray-100" hidden></th>
               </tr>
             </thead>
             <tbody>
@@ -57,10 +58,10 @@
                 var stepId = 1;
                 @foreach (var step in Model.TwilioTestCase.TestSteps)
                 {
-                  <tr>
-                    <td class="p-4 border border-gray-100">
+                  <tr class="hover:bg-sky-50" onmouseover="showDeleteButton('delete_@id', true)" onmouseleave="showDeleteButton('delete_@id', false)">
+                    @*<td class="p-4 border border-gray-100">
                       @await Component.InvokeAsync("Checkbox", new CheckboxViewModel() { Id = $"check_{id}", Name = $"TestSteps[{@id}].IsSelected", Value = "true" })
-                    </td>
+                    </td>*@
                     <td class="p-4 border border-gray-100">
                       @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"stepId_{id}", Name = $"TestSteps[{@id}].Id", Value = (@stepId).ToString(), Enabled = false })
                     </td>
@@ -73,6 +74,11 @@
                     <td class="p-4 border border-gray-100">
                       @await Component.InvokeAsync("TableRowInput", new TableRowInputViewModel() { Id = $"replyWith_{id}", Name = $"TestSteps[{@id}].ReplyWith", Value = @step.ReplyWith })
                     </td>
+                    <td>
+                      <button id="delete_@id" class="rounded-md border border-transparent p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none cursor-pointer" type="button" hidden onclick="deleteStep(@stepId)">
+                        <img src="~/images/icons8-delete-30.png" alt="icon" class="w-16 h-6">
+                      </button>
+                    </td>
                   </tr>
                   id++;
                   stepId++;
@@ -81,13 +87,11 @@
             </tbody>
           </table>
           <div class="w-1/2 flex flex-row justify-center items-center mt-4 mr-2">
-          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Edit", Type = "submit", Text = "Edit Test",
-                    TailwindClasses = "w-1/2 mr-4" })
+          @*@await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Edit", Type = "submit", Text = "Edit Test",
+                    TailwindClasses = "w-1/2 mr-4" })*@
           @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "AddStep", Type = "button", Text = "Add Step",
-                    TailwindClasses = "w-1/2" })
-          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Delete", Type = "button", Text = "Delete", IsHidden = true,
-                    TailwindClasses = "w-1/2" })
-          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Save", Type = "button", Text = "Save", IsHidden = true,
+                    TailwindClasses = "w-1/2 mr-4" })
+          @await Component.InvokeAsync("Button", new ButtonViewModel { Id = "Save", Type = "submit", Text = "Save", IsHidden = true,
                     TailwindClasses = "w-1/2" })
           </div>
         </div>
@@ -109,15 +113,65 @@ for (const [key, value] of formData) {
 </script>*@
 
 <script>
+  window.addEventListener("load", () => {
+  // (PART A) GET TABLE ROWS, EXCLUDE HEADER ROW
+  var allRows = document.querySelectorAll("#stepsTable tr");
+  var all = Array.from(allRows).slice(1);
+
+  // (PART B) "CURRENT ROW BEING DRAGGED"
+  var dragged;
+
+  // (PART C) DRAG-AND-DROP MECHANISM
+  for (let tr of all) {
+    // (C1) ROW IS DRAGGABLE
+    tr.draggable = true;
+
+    // (C2) ON DRAG START - SET "CURRENTLY DRAGGED" & DATA TRANSFER
+    tr.ondragstart = e => {
+      dragged = tr;
+      e.dataTransfer.dropEffect = "move";
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/html", tr.innerHTML);
+    };
+
+    // (C3) PREVENT DRAG OVER - NECESSARY FOR DROP TO WORK
+    tr.ondragover = e => e.preventDefault();
+
+    // (C4) ON DROP - "SWAP ROWS"
+    tr.ondrop = e => {
+      e.preventDefault();
+      if (dragged != tr) {
+        dragged.innerHTML = tr.innerHTML;
+        tr.innerHTML = e.dataTransfer.getData("text/html");
+      }
+      document.getElementById("Save").hidden = false;
+      arrangeTableRows();
+    };
+    // (C5) COSMETICS - HIGHLIGHT ROW "ON DRAG HOVER"
+    tr.ondragenter = () => tr.classList.add("hover");
+    tr.ondragleave = () => tr.classList.remove("hover");
+    tr.ondragend = () => {
+      for (let r of all) { r.classList.remove("hover"); }
+    };
+  }
+});
+</script>
+
+<script>
   const elements = {
-      editButton: document.querySelector("#Edit"),
+      //editButton: document.querySelector("#Edit"),
       addStepButton: document.querySelector("#AddStep"),
-      deleteButton: document.querySelector("#Delete"),
+      //deleteButton: document.querySelector("#Delete"),
       saveButton: document.querySelector("#Save"),
       stepTable: document.querySelector("#stepsTable")
     }
 
-  function enableDisableDeleteButton(event) {
+  function showDeleteButton(id, show) {
+    const deleteButton = document.getElementById(id);
+    deleteButton.hidden = show ? false : true;
+  }
+
+  /*function enableDisableDeleteButton(event) {
     let deleteEnabled = false;
     let stepChecks = document.querySelectorAll("input[type=checkbox]");
     for (let i = 0; i < stepChecks.length; i++) {
@@ -126,9 +180,8 @@ for (const [key, value] of formData) {
         break;
       }
     }
-    (deleteEnabled) ? elements.deleteButton.hidden = false : elements.deleteButton.hidden = true;
     (deleteEnabled) ? elements.saveButton.hidden = false : elements.saveButton.hidden = true;
-  }
+  }*/
 
   function updateParagraph(event) {
     const paragraphs = document.getElementsByTagName("p");
@@ -140,8 +193,12 @@ for (const [key, value] of formData) {
 
   function addNewStep(){
       let stepTable = document.getElementById("stepsTable");
-      const rowCount = stepTable.rows.length;
+      let deleteHiddenRow = false;
+      let rowCount = stepTable.rows.length;
       var existingRow = elements.stepTable.rows[1];
+      if(rowCount == 2 && existingRow.hidden){
+        deleteHiddenRow = true;
+      }
       let newRow = stepTable.insertRow(rowCount);
       let cell1 = newRow.insertCell(0);
       let cell2 = newRow.insertCell(1);
@@ -155,6 +212,10 @@ for (const [key, value] of formData) {
       cell4.className = className;
       cell5.className = className;
       updateTableElementProperties(newRow, existingRow, rowCount-2, "new");
+      if(deleteHiddenRow){
+        stepTable.deleteRow(1);
+      }
+      arrangeTableRows();
       elements.saveButton.hidden = false;
   }
 
@@ -163,26 +224,29 @@ for (const [key, value] of formData) {
     let expectedResult = "";
     let replyWith = "";
     if(rowType == "existing"){
-      stepDescription = tableRow.cells[2].children[0].value;
-      expectedResult = tableRow.cells[3].children[1].textContent;
-      replyWith = tableRow.cells[4].children[0].value;
+      stepDescription = tableRow.cells[1].children[0].value;
+      expectedResult = tableRow.cells[2].children[1].textContent;
+      replyWith = tableRow.cells[3].children[0].value;
     }
+    tableRow.innerHTML = existingRow.innerHTML;
+    tableRow.className = existingRow.className;
     for (let i = 0; i < tableRow.cells.length; i++) {
       tableRow.cells[i].innerHTML = existingRow.cells[i].innerHTML;
     }
 
-    tableRow.cells[0].children[1].value = "true";
-    tableRow.cells[1].children[0].value = "";
-    tableRow.cells[2].children[0].value = stepDescription;
-    tableRow.cells[3].children[1].textContent = expectedResult;
-    tableRow.cells[4].children[0].value = replyWith;
+    tableRow.cells[0].children[0].value = "";
+    tableRow.cells[1].children[0].value = stepDescription;
+    tableRow.cells[2].children[1].textContent = expectedResult;
+    tableRow.cells[3].children[0].value = replyWith;
   }
 
   function arrangeTableRows() {
     const table = document.getElementById("stepsTable");
     for (let i = 1; i < table.rows.length; i++) {
         const row = table.rows[i];
-        row.cells[1].children[0].value = i;
+        row.cells[0].children[0].value = i;
+        row.setAttribute("onmouseover", `showDeleteButton('delete_${i -1}', true)`);
+        row.setAttribute("onmouseleave", `showDeleteButton('delete_${i - 1}', false)`);
         for (let j = 0; j < row.cells.length; j++) {
             updateIdAndNamePropertyIndex(row.cells[j], i - 1);
         }
@@ -202,7 +266,42 @@ for (const [key, value] of formData) {
         if (typeof child.name === 'string' && child.name) {
             child.name = child.name.replace(/\[\d+\]/, `[${newIndex}]`);
         }
+
+        if(child.onclick != null){
+          child.setAttribute("onclick", `deleteStep(${newIndex + 1})`);
+        }
     }
+  }
+
+  function addHiddenStepIfNoStepExists(){
+    let stepTable = document.getElementById("stepsTable");
+    const rowCount = stepTable.rows.length;
+    var existingRow = elements.stepTable.rows[1];
+    let newRow = stepTable.insertRow(rowCount);
+    let cell1 = newRow.insertCell(0);
+    let cell2 = newRow.insertCell(1);
+    let cell3 = newRow.insertCell(2);
+    let cell4 = newRow.insertCell(3);
+    let cell5 = newRow.insertCell(4);
+    const className = existingRow.cells[0].className;
+    cell1.className = className;
+    cell2.className = className;
+    cell3.className = className;
+    cell4.className = className;
+    cell5.className = className;
+    updateTableElementProperties(newRow, existingRow, rowCount-2, "new");
+    arrangeTableRows();
+    newRow.hidden = true;
+  }
+
+  function deleteStep(rowId){
+    let stepTable = document.getElementById("stepsTable");
+    if(stepTable.rows.length == 2){
+      addHiddenStepIfNoStepExists();
+    }
+    stepTable.deleteRow(rowId);
+    arrangeTableRows();
+    elements.saveButton.hidden = false;
   }
 
   function deleteSteps(event){
@@ -212,6 +311,9 @@ for (const [key, value] of formData) {
     for (let i = 0; i < stepChecks.length; i++) {
       if (stepChecks[i].checked) {
         var rowId = i+1-deletedRows;
+        if(stepTable.rows.length == 2){
+          addHiddenStepIfNoStepExists();
+        }
         stepTable.deleteRow(rowId);
         if(stepTable.rows[rowId] != null){
           updateTableElementProperties(stepTable.rows[rowId], stepTable.rows[rowId], rowId, "existing");
@@ -224,21 +326,21 @@ for (const [key, value] of formData) {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-      elements.editButton.addEventListener("click", updateParagraph);
+      //elements.editButton.addEventListener("click", updateParagraph);
       elements.addStepButton.addEventListener("click", addNewStep);
       /*document.querySelectorAll("input[type=checkbox]").forEach((stepCheck) => {
         stepCheck.addEventListener("change", enableDisableDeleteButton);
       });*/
-      elements.deleteButton.addEventListener("click", deleteSteps);
-      elements.saveButton.addEventListener("click", arrangeTableRows);
+      //elements.deleteButton.addEventListener("click", deleteSteps);
+      elements.saveButton.addEventListener("click", updateParagraph);
     });
 
     // Add event listener to a parent container (like the body or form)
-    document.body.addEventListener("change", function(event) {
+    /*document.body.addEventListener("change", function(event) {
       // Check if the target is a checkbox
       if (event.target && event.target.type === "checkbox") {
         enableDisableDeleteButton(event);
       }
-    });
+    });*/
 
   </script>

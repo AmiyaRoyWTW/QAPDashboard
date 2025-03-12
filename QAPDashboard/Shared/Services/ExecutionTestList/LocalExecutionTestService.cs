@@ -1,4 +1,5 @@
 using System.Globalization;
+using Newtonsoft.Json;
 using QAPDashboard.Shared.Configurations;
 using QAPDashboard.Shared.Models.Twillio;
 using QAPDashboard.Shared.Services.TestRuns;
@@ -18,7 +19,7 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
         executedTests.Add(new ExecutedTests
         {
           TestName = Path.GetFileName(resultDirectory),
-          LastExecutionStatus = localTestRunService.GetTestStatus(latestRun.CallId)
+          LastExecutionStatus = GetTestStatus(latestRun.CallId)
         });
       }
       return executedTests;
@@ -86,7 +87,7 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
           executedTests.Add(new ExecutedTests
           {
             TestName = Path.GetFileName(resultDirectory),
-            LastExecutionStatus = localTestRunService.GetTestStatus(latestRun.CallId)
+            LastExecutionStatus = GetTestStatus(latestRun.CallId)
           });
         }
       }
@@ -106,6 +107,28 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
         }
       }
       return callResponses.OrderByDescending(static call => call.DateCreated).FirstOrDefault() ?? new CallResponse();
+    }
+
+    public string GetTestStatus(string resultPath)
+    {
+      string status = "Failed";
+      var testResults = Directory.GetFiles(resultPath).Where(x => x.EndsWith("callstatus.json")).FirstOrDefault();
+      if (testResults != null)
+      {
+        var callStatus = JsonConvert.DeserializeObject<CallStatus>(File.ReadAllText(testResults));
+        if (callStatus != null)
+        {
+          status = callStatus.Status.ToLower() switch
+          {
+            "inprogress" => "In Progress",
+            "passed" => "Passed",
+            "failed" => "Failed",
+            "error" => "Errored",
+            _ => "Unknown",
+          };
+        }
+      }
+      return status;
     }
 
   }

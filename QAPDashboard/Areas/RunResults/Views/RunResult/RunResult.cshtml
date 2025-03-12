@@ -56,7 +56,10 @@
                                 <tbody>
                                     <tr>
                                         <td class="font-bold text-2xl text-right">Test Case:</td>
-                                        <td class="font-light text-2xl text-left">@Model.TestName</td>
+                                        <td class="font-light text-2xl text-left">
+                                            <a href="/test-management/@Model.TestName"
+                                                class="text-blue-500 hover:underline">@Model.TestName</a>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td class="font-bold text-2xl text-right">Test Description:</td>
@@ -137,7 +140,7 @@
                                 "passed" => "border-l-green-500",
                                 "failed" => "border-l-red-400",
                                 "callinprogress" => "border-l-yellow-200",
-                                "notrun" => "border-l-grey-200",
+                                "didnotexecuted" => "border-l-gray-300",
                                 "errored" => "border-l-red-600",
                                 _ => "border-l-yellow-100"
                             };
@@ -154,13 +157,22 @@
                                     "passed" => "bg-green-500",
                                     "failed" => "bg-red-400",
                                     "callinprogress" => "bg-yellow-200",
-                                    "notrun" => "bg-grey-200",
+                                    "didnotexecuted" => "bg-gray-200",
                                     "errored" => "bg-red-600",
                                     _ => "bg-yellow-100"
                                 };
+                                var statusToShow = step.Status switch
+                                {
+                                    "Passed" => "Passed",
+                                    "Failed" => "Failed",
+                                    "CallInProgress" => "Call In Progress",
+                                    "DidNotExecuted" => "Did Not Executed",
+                                    "Errored" => "Errored",
+                                    _ => "Unknown"
+                                };
                             }
                             <span class="border-2 border-solid font-extrabold text-xl text-center @color rounded-lg">
-                                @step.Status</span>
+                                @statusToShow</span>
                             <li class="font-light mt-2">Mathed with confidence: @step.Confidence%</li>
                             <li class="font-light">Duration: @step.StepDuration</li>
                             <li class="font-light">Response time: @step.ResponseTime</li>
