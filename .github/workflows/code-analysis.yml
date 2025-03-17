@@ -1,0 +1,124 @@
+name: GHAS Code Scans
+# https://github.com/github/codeql-action
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  repository_dispatch:
+    types: [code-scan]
+  workflow_dispatch:
+  schedule:
+    #        ┌───────────── minute (0 - 59)
+    #        │  ┌───────────── hour (0 - 23)
+    #        │  │ ┌───────────── day of the month (1 - 31)
+    #        │  │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #        │  │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #        │  │ │ │ │
+    #        │  │ │ │ │
+    #        │  │ │ │ │
+    #        *  * * * *
+    - cron: "30 1 * * 0"
+
+jobs:
+
+  Dependency-Review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    permissions:
+      actions: read # only required for workflows in private repositories
+      contents: read # for actions/checkout fetch code
+      pull-requests: write # can write to pull requests
+      security-events: write # required for all workflows
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # https://github.com/actions/dependency-review-action
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+
+  CodeQL-Scan:
+    strategy:
+      matrix:
+        languages: [csharp, javascript]
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read # only required for workflows in private repositories
+      contents: read # for actions/checkout fetch code
+      pull-requests: write # can write to pull requests
+      security-events: write # required for all workflows
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # For JavaScript use filter-sarif action so we can remove results from dist folders
+      # https://github.com/advanced-security/filter-sarif
+
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          ram: 3072
+          # Using additional queries to get more results
+          # See https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/customizing-code-scanning#using-queries-in-ql-packs
+          queries: security-and-quality
+          languages: ${{ matrix.languages }}
+
+      # Autobuild attempts to build any compiled languages (C/C++, C#, Go, or Java).
+      # If this step fails, then you should remove it and run the build manually (see below).
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      # ℹ️ Command-line programs to run using the OS shell.
+      # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+
+      # ✏️ If the Autobuild fails above, remove it and uncomment the following
+      #    three lines and modify them (or add more) to build your code if your
+      #    project uses a compiled language
+
+      # - run: |
+      #   echo "Run, Build Application using script"
+      #   ./location_of_script_within_repo/buildscript.sh
+
+      # Perform normal analysis
+      - name: Perform CodeQL Analysis
+        if: matrix.languages != 'javascript'
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /codeql-scan:${{ matrix.languages }}
+
+      # For JavaScript run analysis differently so we can ignore directories in the results
+      - name: Perform JavaScript CodeQL Analysis
+        if: matrix.languages == 'javascript'
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /codeql-scan:${{ matrix.languages }}
+          upload: False
+          output: sarif-results
+
+      - name: Filter JavaScript SARIF Results
+        if: matrix.languages == 'javascript'
+        # Information about this tool
+        # https://github.com/advanced-security/filter-sarif
+        uses: advanced-security/filter-sarif@v1
+        with:
+          # Remove results under dist directory
+          patterns: |
+            -**/dist/**
+          input: sarif-results/javascript.sarif
+          output: sarif-results/javascript.sarif
+
+      - name: Upload JavaScript SARIF Results
+        if: matrix.languages == 'javascript'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: sarif-results/javascript.sarif
