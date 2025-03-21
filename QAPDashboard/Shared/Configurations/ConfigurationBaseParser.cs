@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace QAPDashboard.Shared.Configurations
+﻿namespace QAPDashboard.Shared.Configurations
 {
     public class ConfigurationBaseParser
     {
@@ -30,7 +28,7 @@ namespace QAPDashboard.Shared.Configurations
                     }
                     if (!GetOption(args[n], value, pos) && !RunnerConfigurationParser.GetOption(args[n], value, pos))
                     {
-                        Console.WriteLine("***ERROR::Invalid argument :: {0}", args[n]);
+                        Console.WriteLine($"***ERROR::Invalid argument :: {args[n]}");
                     }
                 }
                 n++;
@@ -42,57 +40,58 @@ namespace QAPDashboard.Shared.Configurations
         {
             string option = arg[pos..];
 
-            if (option is "st" or "storagetype")
+            switch (option.ToLower())
             {
-                RunnerConfiguration.StorageType = value.ToLower();
-            }
-            else if (option is "fsp" or "filestoragepath")
-            {
-                RunnerConfiguration.FileStoragePath = value.ToLower();
-            }
-            else if (option is "at" or "applicationtype")
-            {
-                RunnerConfiguration.ApplicationType = value.ToLower();
-            }
-            else if (option is "azsa" or "azstorageaccount")
-            {
-                RunnerConfiguration.AZStorageAccount = value;
-            }
-            else if (option is "azsk" or "azstoragekey")
-            {
-                RunnerConfiguration.AZStorageKey = value;
-            }
-            else if (option is "azsbc" or "azstoragescreenshot")
-            {
-                RunnerConfiguration.AZStorageScreenShotBlobContainer = value;
-            }
-            else if (option is "azst" or "azstoragetable")
-            {
-                RunnerConfiguration.AZStorageTable = value;
-            }
-            else if (option is "ltd" or "logtestdata")
-            {
-                RunnerConfiguration.LogTestData = true;
-            }
-            else if (option is "azstbc" or "azstoragetestdata")
-            {
-                RunnerConfiguration.AZStorageTestDataBlobContainer = value;
-            }
-            else if (option is "lta" or "logtestaction")
-            {
-                RunnerConfiguration.LogTestAction = true;
-            }
-            else if (option is "azsta" or "azstoragetestaction")
-            {
-                RunnerConfiguration.AZStorageTestDataBlobContainer = value;
-            }
-            else if (option is "lurl" or "loggingapi")
-            {
-                RunnerConfiguration.LoggingAPIUrl = value;
-            }
-            else
-            {
-                return false;
+                case "st":
+                case "storagetype":
+                    RunnerConfiguration.StorageType = value.ToLower();
+                    break;
+                case "fsp":
+                case "filestoragepath":
+                    RunnerConfiguration.FileStoragePath = value.ToLower();
+                    break;
+                case "at":
+                case "applicationtype":
+                    RunnerConfiguration.ApplicationType = value.ToLower();
+                    break;
+                case "azsa":
+                case "azstorageaccount":
+                    RunnerConfiguration.AZStorageAccount = value;
+                    break;
+                case "azsk":
+                case "azstoragekey":
+                    RunnerConfiguration.AZStorageKey = value;
+                    break;
+                case "azsbc":
+                case "azstoragescreenshot":
+                    RunnerConfiguration.AZStorageScreenShotBlobContainer = value;
+                    break;
+                case "azst":
+                case "azstoragetable":
+                    RunnerConfiguration.AZStorageTable = value;
+                    break;
+                case "ltd":
+                case "logtestdata":
+                    RunnerConfiguration.LogTestData = true;
+                    break;
+                case "azstbc":
+                case "azstoragetestdata":
+                    RunnerConfiguration.AZStorageTestDataBlobContainer = value;
+                    break;
+                case "lta":
+                case "logtestaction":
+                    RunnerConfiguration.LogTestAction = true;
+                    break;
+                case "azsta":
+                case "azstoragetestaction":
+                    RunnerConfiguration.AZStorageTestDataBlobContainer = value;
+                    break;
+                case "lurl":
+                case "loggingapi":
+                    RunnerConfiguration.LoggingAPIUrl = value;
+                    break;
+                default:
+                    return false;
             }
 
             return true;
@@ -100,24 +99,17 @@ namespace QAPDashboard.Shared.Configurations
 
         private static int IsOption(string opt)
         {
-            char[] c;
             if (opt.Length < 2)
             {
                 return 0;
             }
-            else if (opt.Length > 2)
+
+            if (opt.StartsWith("--") && IsOptionNameChar(opt[2]))
             {
-                c = opt.ToCharArray(0, 3);
-                if (c[0] == '-' && c[1] == '-' && IsOptionNameChar(c[2]))
-                {
-                    return 2;
-                }
+                return 2;
             }
-            else
-            {
-                c = opt.ToCharArray(0, 2);
-            }
-            return c[0] == '-' || (c[0] == '/' && IsOptionNameChar(c[1])) ? 1 : 0;
+
+            return opt[0] == '-' || (opt[0] == '/' && IsOptionNameChar(opt[1])) ? 1 : 0;
         }
 
         private static bool IsOptionNameChar(char c)
@@ -131,6 +123,7 @@ namespace QAPDashboard.Shared.Configurations
             {
                 return;
             }
+
             if (RunnerConfiguration.AZStorageConnectionString != null)
             {
                 var connectionStringParts = RunnerConfiguration.AZStorageConnectionString.Split(";");
@@ -148,22 +141,24 @@ namespace QAPDashboard.Shared.Configurations
             {
                 throw new ArgumentNullException(nameof(RunnerConfiguration.AZStorageConnectionString), "AZStorageConnectionString cannot be null.");
             }
+
             RunnerConfiguration.AZStorageRunSummaryBlobContainer = "qaprunsummaryblobcontainer";
             RunnerConfiguration.AZStorageExecutedTestsBlobContainer = "qapexecutedtestsblobcontainer";
             RunnerConfiguration.AZStorageTestDataBlobContainer = "qaprunstestdatablobcontainer";
+
             if (RunnerConfiguration.AZStorageAccount == null || RunnerConfiguration.AZStorageKey == null || RunnerConfiguration.AZStorageRunSummaryBlobContainer == null)
             {
-                throw new ArgumentException($"Missing arguments for given storage type. Azure storage requires AZStorageAccount, AZStorageKey, AZStorageExecutedTestsBlobContainer, and AZStorageRunSummaryBlobContainer to be set.");
+                throw new ArgumentException("Missing arguments for given storage type. Azure storage requires AZStorageAccount, AZStorageKey, AZStorageExecutedTestsBlobContainer, and AZStorageRunSummaryBlobContainer to be set.");
             }
 
-            if (RunnerConfiguration.LogTestData == true && (RunnerConfiguration.AZStorageTestDataBlobContainer == null || RunnerConfiguration.AZStorageAccount == null))
+            if (RunnerConfiguration.LogTestData && (RunnerConfiguration.AZStorageTestDataBlobContainer == null || RunnerConfiguration.AZStorageAccount == null))
             {
-                throw new ArgumentException($"Missing arguments for given storage type and account. Azure Test Data Storage requires AZStorageTestDataBlobContainer to be set and AzStorageAccount.");
+                throw new ArgumentException("Missing arguments for given storage type and account. Azure Test Data Storage requires AZStorageTestDataBlobContainer to be set and AzStorageAccount.");
             }
 
-            if (RunnerConfiguration.LogTestAction == true && (RunnerConfiguration.AZStorageTestActionBlobContainer == null || RunnerConfiguration.AZStorageAccount == null))
+            if (RunnerConfiguration.LogTestAction && (RunnerConfiguration.AZStorageTestActionBlobContainer == null || RunnerConfiguration.AZStorageAccount == null))
             {
-                throw new ArgumentException($"Missing arguments for given storage type and account. Azure Test Action Storage requires AZStorageTestActionBlobContainer to be set and AzStorageAccount.");
+                throw new ArgumentException("Missing arguments for given storage type and account. Azure Test Action Storage requires AZStorageTestActionBlobContainer to be set and AzStorageAccount.");
             }
         }
     }

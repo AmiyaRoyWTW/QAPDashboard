@@ -45,8 +45,7 @@ namespace QAPDashboard.Areas.TestCasesLibrary.Controllers
       {
         _testCasesLibraryService.UpdateTwilioTestCase(twilioTestCaseForm);
         Thread.Sleep(500);
-
-        return Redirect("/test-management/" + twilioTestCaseForm.TestName);
+        return LocalRedirect("/test-management/" + twilioTestCaseForm.TestName);
       }
       catch (Exception ex)
       {

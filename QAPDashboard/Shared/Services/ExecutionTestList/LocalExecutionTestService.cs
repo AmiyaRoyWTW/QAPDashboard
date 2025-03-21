@@ -3,14 +3,16 @@ using Newtonsoft.Json;
 using QAPDashboard.Shared.Configurations;
 using QAPDashboard.Shared.Models.Twillio;
 using QAPDashboard.Shared.Services.TestRuns;
+
 namespace QAPDashboard.Shared.Services.ExecutionTestList
 {
   public class LocalExecutionTestService : IExecutionTestService
   {
     public LocalTestRunService localTestRunService = new();
+
     public List<ExecutedTests> GetLocalExecutedTests()
     {
-      List<ExecutedTests> executedTests = [];
+      var executedTests = new List<ExecutedTests>();
       var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
       foreach (var resultDirectory in resultDirectories)
       {
@@ -24,6 +26,7 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
       }
       return executedTests;
     }
+
     public List<ExecutedTests> GetLocalExecutedTests(string dateRange = "", string startDate = "", string endDate = "")
     {
       DateTime? selectedStartDate;
@@ -32,7 +35,7 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
       {
         case "Today":
           selectedStartDate = DateTime.UtcNow.Date;
-          selectedEndDate = DateTime.UtcNow.Date.AddDays(-1).AddTicks(+1);
+          selectedEndDate = DateTime.UtcNow.Date.AddDays(1).AddTicks(-1);
           break;
         case "Last 15 Minutes":
           selectedStartDate = DateTime.UtcNow.AddMinutes(-15);
@@ -64,8 +67,8 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
           break;
         case "Custom Range":
           selectedStartDate = string.IsNullOrEmpty(startDate)
-          ? null
-          : DateTime.ParseExact(startDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).AddDays(-1).Date;
+              ? null
+              : DateTime.ParseExact(startDate, "yyyyMMddHHmmssfffffff", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).AddDays(-1).Date;
 
           selectedEndDate = string.IsNullOrEmpty(endDate)
               ? null
@@ -73,10 +76,11 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
           break;
         default:
           selectedStartDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-          selectedEndDate = DateTime.Now;
+          selectedEndDate = DateTime.UtcNow;
           break;
       }
-      List<ExecutedTests> executedTests = [];
+
+      var executedTests = new List<ExecutedTests>();
       var resultDirectories = Directory.GetDirectories(RunnerConfiguration.FileStoragePath);
       foreach (var resultDirectory in resultDirectories)
       {
@@ -96,7 +100,7 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
 
     private CallResponse GetLatestCallDetails(string[] directories)
     {
-      List<CallResponse> callResponses = [];
+      var callResponses = new List<CallResponse>();
       foreach (var directory in directories)
       {
         var callResponse = localTestRunService.GetTestStats(directory);
@@ -106,30 +110,36 @@ namespace QAPDashboard.Shared.Services.ExecutionTestList
           callResponses.Add(callResponse);
         }
       }
-      return callResponses.OrderByDescending(static call => call.DateCreated).FirstOrDefault() ?? new CallResponse();
+      return callResponses.OrderByDescending(call => call.DateCreated).FirstOrDefault() ?? new CallResponse();
     }
 
     public string GetTestStatus(string resultPath)
     {
-      string status = "Failed";
-      var testResults = Directory.GetFiles(resultPath).Where(x => x.EndsWith("callstatus.json")).FirstOrDefault();
+      var status = "Failed";
+      var testResults = Directory.GetFiles(resultPath).FirstOrDefault(x => x.EndsWith("callstatus.json"));
       if (testResults != null)
       {
-        var callStatus = JsonConvert.DeserializeObject<CallStatus>(File.ReadAllText(testResults));
-        if (callStatus != null)
+        try
         {
-          status = callStatus.Status.ToLower() switch
+          var callStatus = JsonConvert.DeserializeObject<CallStatus>(File.ReadAllText(testResults));
+          if (callStatus != null)
           {
-            "inprogress" => "In Progress",
-            "passed" => "Passed",
-            "failed" => "Failed",
-            "error" => "Errored",
-            _ => "Unknown",
-          };
+            status = callStatus.Status.ToLower() switch
+            {
+              "inprogress" => "In Progress",
+              "passed" => "Passed",
+              "failed" => "Failed",
+              "error" => "Errored",
+              _ => "Unknown",
+            };
+          }
+        }
+        catch (JsonException)
+        {
+          throw new Exception("Failed to parse call status");
         }
       }
       return status;
     }
-
   }
 }

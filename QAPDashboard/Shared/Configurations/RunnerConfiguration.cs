@@ -4,7 +4,7 @@
     {
         public static string? AllowedHosts { get; set; }
         public static string? StorageType { get; set; }
-        public static string FileStoragePath { get; set; } = String.Empty;
+        public static string FileStoragePath { get; set; } = string.Empty;
         public static string? TestInventoryFileStoragePath { get; set; }
         public static string? ApplicationType { get; set; }
         public static int DashboardPort { get; set; }

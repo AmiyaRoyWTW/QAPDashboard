@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using QAPDashboard.Areas.TestCasesLibrary.Models;
 using QAPDashboard.Shared.Configurations;
 using QAPDashboard.Shared.Models.Twillio;
+
 namespace QAPDashboard.Shared.Services.TestCasesLibrary
 {
   public class LocalTestCasesLibraryService : ITestCasesLibraryService
@@ -9,10 +10,10 @@ namespace QAPDashboard.Shared.Services.TestCasesLibrary
     public string[] GetLocalTestNames()
     {
       var twilioTestManagementFiles = RunnerConfiguration.TestInventoryFileStoragePath != null
-                ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
-                : [];
-      var twilioTestManagementFile = twilioTestManagementFiles.Where(x => Path.GetFileName(x).Equals("TwilioTests.json"));
-      var twilioTests = JsonConvert.DeserializeObject<TwilioTestCase>(File.ReadAllText(twilioTestManagementFile.First()));
+          ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
+          : [];
+      var twilioTestManagementFile = twilioTestManagementFiles.FirstOrDefault(x => Path.GetFileName(x).Equals("TwilioTests.json")) ?? throw new Exception("TwilioTests.json file not found");
+      var twilioTests = JsonConvert.DeserializeObject<TwilioTestCase>(File.ReadAllText(twilioTestManagementFile));
       return twilioTests?.Tests?.Select(x => x.TestName).ToArray() ?? [];
     }
 
@@ -24,23 +25,24 @@ namespace QAPDashboard.Shared.Services.TestCasesLibrary
     public Tests GetTwilioTestCase(string testName)
     {
       var twilioTestManagementFiles = RunnerConfiguration.TestInventoryFileStoragePath != null
-                ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
-                : [];
-      var twilioTestManagementFile = twilioTestManagementFiles.Where(x => Path.GetFileName(x).Equals("TwilioTests.json"));
-      var twilioTests = JsonConvert.DeserializeObject<TwilioTestCase>(File.ReadAllText(twilioTestManagementFile.First()));
-      return twilioTests?.Tests?.Where(x => x.TestName.Equals(testName)).FirstOrDefault() ?? new Tests();
+          ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
+          : [];
+      var twilioTestManagementFile = twilioTestManagementFiles.FirstOrDefault(x => Path.GetFileName(x).Equals("TwilioTests.json")) ?? throw new Exception("TwilioTests.json file not found");
+      var twilioTests = JsonConvert.DeserializeObject<TwilioTestCase>(File.ReadAllText(twilioTestManagementFile));
+      return twilioTests?.Tests?.FirstOrDefault(x => x.TestName.Equals(testName)) ?? new Tests();
     }
 
     public void UpdateTwilioTestCase(TwilioTestCaseForm testCaseForm)
     {
       var id = 1;
       var twilioTestManagementFiles = RunnerConfiguration.TestInventoryFileStoragePath != null
-                ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
-                : [];
-      var twilioTestManagementFile = twilioTestManagementFiles.Where(x => Path.GetFileName(x).Equals("TwilioTests.json"));
-      var twilioTests = JsonConvert.DeserializeObject<TwilioTestCase>(File.ReadAllText(twilioTestManagementFile.First())) ?? throw new Exception("Test case library find not found");
-      var test = twilioTests.Tests.Where(x => x.TestName.Equals(testCaseForm.TestName)).FirstOrDefault();
-      var oldTest = twilioTests.Tests.Where(x => x.TestName.Equals(testCaseForm.OldTestName)).FirstOrDefault();
+          ? Directory.GetFiles(RunnerConfiguration.TestInventoryFileStoragePath)
+          : [];
+      var twilioTestManagementFile = twilioTestManagementFiles.FirstOrDefault(x => Path.GetFileName(x).Equals("TwilioTests.json")) ?? throw new Exception("TwilioTests.json file not found");
+      var twilioTests = JsonConvert.DeserializeObject<TwilioTestCase>(File.ReadAllText(twilioTestManagementFile)) ?? throw new Exception("Test case library not found");
+      var test = twilioTests.Tests.FirstOrDefault(x => x.TestName.Equals(testCaseForm.TestName));
+      var oldTest = twilioTests.Tests.FirstOrDefault(x => x.TestName.Equals(testCaseForm.OldTestName));
+
       if (test == null && oldTest == null)
       {
         twilioTests.Tests.Add(new Tests
@@ -79,7 +81,8 @@ namespace QAPDashboard.Shared.Services.TestCasesLibrary
           ReplyWith = x.ReplyWith
         })];
       }
-      File.WriteAllText(twilioTestManagementFile.First(), JsonConvert.SerializeObject(twilioTests));
+
+      File.WriteAllText(twilioTestManagementFile, JsonConvert.SerializeObject(twilioTests));
     }
   }
 }
