@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # https://github.com/actions/dependency-review-action
       - name: Dependency Review
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # For JavaScript use filter-sarif action so we can remove results from dist folders
       # https://github.com/advanced-security/filter-sarif
